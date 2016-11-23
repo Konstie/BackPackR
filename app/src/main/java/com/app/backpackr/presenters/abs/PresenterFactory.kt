@@ -1,9 +1,9 @@
 package com.app.backpackr.presenters.abs
 
 /**
- * Created by konstie on 13.11.16.
+ * Created by kmikhailovskiy on 23.11.2016.
  */
 
-interface PresenterFactory<V, out T : Presenter<V>> {
+interface PresenterFactory<T : Presenter<*>> {
     fun create(): T
 }

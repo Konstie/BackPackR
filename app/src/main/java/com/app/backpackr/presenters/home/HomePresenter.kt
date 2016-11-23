@@ -10,15 +10,15 @@ import com.app.backpackr.presenters.abs.Presenter
 class HomePresenter(context : Context?) : Presenter<HomeView> {
 
     override fun onViewAttached(view: HomeView) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun onViewDetached() {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun onDestroyed() {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
 }

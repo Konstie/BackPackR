@@ -1,28 +1,45 @@
 package com.app.backpackr.presenters.abs
 
-import android.content.Context
-import android.content.Loader
-
 /**
- * Created by konstie on 13.11.16.
+ * Created by kmikhailovskiy on 23.11.2016.
  */
 
-class PresenterLoader<V, P : Presenter<V>>(val factory: PresenterFactory<V, P>, var presenter : P? = null, context: Context?) : Loader<P>(context) {
+import android.content.Context
+import android.support.v4.content.Loader
+import android.util.Log
+
+class PresenterLoader<T : Presenter<*>>(context: Context, private val factory: PresenterFactory<T>, private val tag: String) : Loader<T>(context) {
+    private var presenter: T? = null
+
     override fun onStartLoading() {
         if (presenter != null) {
-            deliverResult(presenter)
+            deliverResult(presenter as T)
             return
         }
+
         forceLoad()
     }
 
     override fun onForceLoad() {
         presenter = factory.create()
-        deliverResult(presenter)
+
+        deliverResult(presenter as T)
+    }
+
+    override fun deliverResult(data: T) {
+        super.deliverResult(data)
+        Log.i("loader", "deliverResult-" + tag)
+    }
+
+    override fun onStopLoading() {
+        Log.i("loader", "onStopLoading-" + tag)
     }
 
     override fun onReset() {
-        presenter?.onDestroyed()
-        presenter = null
+        Log.i("loader", "onReset-" + tag)
+        if (presenter != null) {
+            presenter?.onDestroyed()
+            presenter = null
+        }
     }
 }
