@@ -1,4 +1,4 @@
-package com.app.backpackr.ui.textcapture
+package com.app.backpackr.ui.sections.textcapture
 
 import android.content.Intent
 import android.content.IntentFilter
@@ -8,7 +8,10 @@ import android.util.Log
 import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.textcapture.ITextCaptureView
 import com.app.backpackr.presenters.textcapture.TextCapturePresenter
-import com.app.backpackr.ui.abs.BaseActivity
+import com.app.backpackr.textprocessor.OcrDetectorProcessor
+import com.app.backpackr.ui.sections.abs.BaseActivity
+import com.app.backpackr.ui.views.GraphicOverlay
+import com.app.backpackr.ui.views.OcrGraphic
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.text.TextRecognizer
 
@@ -19,6 +22,7 @@ import com.google.android.gms.vision.text.TextRecognizer
 class TextCaptureActivity(override val presenterFactory: PresenterFactory<TextCapturePresenter>) : BaseActivity<TextCapturePresenter, ITextCaptureView>() {
     var presenter: TextCapturePresenter? = null
     var cameraSource: CameraSource? = null
+    lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
@@ -28,6 +32,7 @@ class TextCaptureActivity(override val presenterFactory: PresenterFactory<TextCa
     fun createCameraSource(autoFocus: Boolean, useFlash: Boolean) {
         val context = applicationContext
         val textRecognizer = TextRecognizer.Builder(context).build()
+        textRecognizer.setProcessor(OcrDetectorProcessor(graphicOverlay))
 
         if (!textRecognizer.isOperational) {
             Log.w(tag(), "Camera detector dependencies are not available")

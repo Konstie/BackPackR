@@ -11,7 +11,7 @@ import com.app.backpackr.R
 import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.home.HomePresenter
 import com.app.backpackr.presenters.home.HomeView
-import com.app.backpackr.ui.abs.BaseActivity
+import com.app.backpackr.ui.sections.abs.BaseActivity
 
 /**
  * Created by konstie on 13.11.16.
@@ -30,7 +30,7 @@ class HomeActivity(override val presenterFactory: PresenterFactory<HomePresenter
         setContentView(R.layout.activity_location_list)
         ButterKnife.bind(this)
         setSupportActionBar(toolbar)
-        toolbar.setTitle(title)
+        toolbar.title = title
 
         presenter = HomePresenter(this)
         presenter?.onViewAttached(this)

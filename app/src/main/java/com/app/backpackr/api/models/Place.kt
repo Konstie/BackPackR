@@ -6,10 +6,10 @@ import io.realm.RealmObject
  * Created by konstie on 17.11.16.
  */
 
-open class Place : RealmObject() {
-    open var title : String? = null
-    open var city : String? = null
-    open var country : String? = null
-    open var address : String? = null
-    open var location : Location? = null
+class Place : RealmObject() {
+    var title : String? = null
+    var city : String? = null
+    var country : String? = null
+    var address : String? = null
+    var location : Location? = null
 }

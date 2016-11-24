@@ -1,4 +1,4 @@
-package com.app.backpackr.ui.abs
+package com.app.backpackr.ui.sections.abs
 
 import android.os.Bundle
 import android.support.v4.app.LoaderManager
