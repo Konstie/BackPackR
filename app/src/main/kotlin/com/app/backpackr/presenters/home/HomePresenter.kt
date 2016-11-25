@@ -8,7 +8,6 @@ import com.app.backpackr.presenters.abs.Presenter
  */
 
 class HomePresenter(context : Context?) : Presenter<HomeView> {
-
     override fun onViewAttached(view: HomeView) {
 
     }

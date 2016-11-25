@@ -49,9 +49,6 @@ abstract class BaseActivity<P : Presenter<V>, V> : AppCompatActivity() {
         Log.i(TAG, "onStop-" + tag())
     }
 
-    /**
-     * String tag use for log purposes.
-     */
     protected abstract fun tag(): String
 
     /**

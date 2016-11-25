@@ -82,7 +82,7 @@ public class HomeActivity extends AppCompatActivity {
 //        @Override
 //        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 //            View view = LayoutInflater.from(parent.getContext())
-//                    .inflate(R.layout.location_list_content, parent, false);
+//                    .inflate(R.layout.item_location, parent, false);
 //            return new ViewHolder(view);
 //        }
 //

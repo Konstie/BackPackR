@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'realm-android'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.neenbedankt.android-apt'
 
-kapt {
-    generateStubs = true
-}
-
 repositories {
     mavenCentral()
+    maven {
+        url "http://repository.jetbrains.com/all"
+    }
 }
 
 android {
@@ -34,6 +34,10 @@ android {
     }
 }
 
+kapt {
+    generateStubs = true
+}
+
 android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -44,6 +48,7 @@ android {
 def supportVersion = '25.0.1'
 def playServicesVersion = '10.0.0'
 def rxVersion = '2.0.0'
+def daggerVersion = '2.4'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -67,10 +72,10 @@ dependencies {
     compile "io.reactivex.rxjava2:rxandroid:$rxVersion"
 
     // dependency injection
-    compile 'com.google.dagger:dagger:2.7'
-    kapt 'com.google.dagger:dagger-compiler:2.7'
+    compile "com.google.dagger:dagger:$daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     provided 'org.glassfish:javax.annotation:10.0-b28'
-    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    kapt 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'com.jakewharton:butterknife:8.4.0'
 
     // network calls
@@ -80,6 +85,9 @@ dependencies {
     }
     compile 'com.squareup.retrofit2:converter-moshi:2.1.0'
     compile 'com.squareup.okhttp3:okhttp:3.3.1'
+
+    // realm
+    compile 'io.realm:android-adapters:1.4.0'
 
     // images processing
     compile 'com.github.bumptech.glide:glide:3.7.0'

@@ -1,8 +1,7 @@
-package com.app.backpackr.ui
+package com.app.backpackr.ui.sections.home
 
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import butterknife.BindView
@@ -16,8 +15,7 @@ import com.app.backpackr.ui.sections.abs.BaseActivity
 /**
  * Created by konstie on 13.11.16.
  */
-class HomeActivity(override val presenterFactory: PresenterFactory<HomePresenter>) : BaseActivity<HomePresenter, HomeView>(), HomeView {
-
+class HomeActivity() : BaseActivity<HomePresenter, HomeView>(), HomeView {
 
     var twoPane = false
     var presenter : HomePresenter? = null
@@ -26,7 +24,8 @@ class HomeActivity(override val presenterFactory: PresenterFactory<HomePresenter
     @BindView(R.id.btn_add_new_place) lateinit var buttonAdd: FloatingActionButton
     @BindView(R.id.location_list) lateinit var locationsListView: RecyclerView
 
-    override fun onCreate(savedState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_location_list)
         ButterKnife.bind(this)
         setSupportActionBar(toolbar)
@@ -40,10 +39,10 @@ class HomeActivity(override val presenterFactory: PresenterFactory<HomePresenter
                 /* open photo activity */
             }
         }
-    }
 
-    override fun tag(): String {
-        return HomeActivity::class.java.name
+        if (findViewById(R.id.location_detail_container) != null) {
+            twoPane = true
+        }
     }
 
     override fun onPresenterPrepared(presenter: HomePresenter) {
@@ -53,4 +52,15 @@ class HomeActivity(override val presenterFactory: PresenterFactory<HomePresenter
         super.onDestroy()
         presenter?.onViewDetached()
     }
+
+    override fun tag(): String {
+        return HomeActivity::class.java.name
+    }
+
+    override val presenterFactory: PresenterFactory<HomePresenter>
+        get() = object : PresenterFactory<HomePresenter> {
+            override fun create(): HomePresenter {
+                return HomePresenter(this@HomeActivity)
+            }
+        }
 }
