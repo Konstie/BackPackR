@@ -9,6 +9,7 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import com.app.backpackr.presenters.abs.PresenterFactory
+import com.app.backpackr.presenters.home.HomePresenter
 import com.app.backpackr.presenters.textcapture.ITextCaptureView
 import com.app.backpackr.presenters.textcapture.TextCapturePresenter
 import com.app.backpackr.textprocessor.OcrDetectorProcessor
@@ -24,7 +25,7 @@ import com.google.android.gms.vision.text.TextRecognizer
  * Created by kmikhailovskiy on 23.11.2016.
  */
 
-class TextCaptureActivity(override val presenterFactory: PresenterFactory<TextCapturePresenter>) : BaseActivity<TextCapturePresenter, ITextCaptureView>() {
+class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureView>() {
     val TEXT_BLOCK_OBJECT = "TEXT_BLOCK_OBJECT"
 
     var presenter: TextCapturePresenter? = null
@@ -109,4 +110,11 @@ class TextCaptureActivity(override val presenterFactory: PresenterFactory<TextCa
     override fun tag(): String {
         return TextCaptureActivity::class.java.name
     }
+
+    override val presenterFactory: PresenterFactory<TextCapturePresenter>
+        get() = object : PresenterFactory<TextCapturePresenter> {
+            override fun create(): TextCapturePresenter {
+                return TextCapturePresenter(this@TextCaptureActivity)
+            }
+        }
 }

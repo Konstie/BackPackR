@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.app.backpackr.R
+import com.app.backpackr.helpers.IntentHelper
 import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.home.HomePresenter
 import com.app.backpackr.presenters.home.HomeView
@@ -35,9 +36,7 @@ class HomeActivity() : BaseActivity<HomePresenter, HomeView>(), HomeView {
         presenter?.onViewAttached(this)
 
         buttonAdd.setOnClickListener {
-            view -> {
-                /* open photo activity */
-            }
+            startActivity(IntentHelper.createOcrCameraIntent(this@HomeActivity))
         }
 
         if (findViewById(R.id.location_detail_container) != null) {
