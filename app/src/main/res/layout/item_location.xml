@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:layout_margin="@dimen/place_card_actions_padding">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,6 +14,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:scaleType="fitStart"
             android:id="@+id/place_header_image_view"/>
         <RelativeLayout
             android:layout_width="match_parent"
@@ -49,6 +51,8 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:id="@+id/btn_remove_location"
+                android:textColor="@color/colorPrimaryDark"
+                android:text="@string/locations_list_map"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
@@ -59,6 +63,8 @@
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/btn_remove_location"
                 android:layout_toRightOf="@id/btn_remove_location"
+                android:textColor="@color/colorPrimaryDark"
+                android:text="@string/locations_list_remove"
                 android:layout_marginStart="@dimen/place_card_actions_padding"
                 android:layout_marginLeft="@dimen/place_card_actions_padding"
                 android:background="@android:color/transparent"/>

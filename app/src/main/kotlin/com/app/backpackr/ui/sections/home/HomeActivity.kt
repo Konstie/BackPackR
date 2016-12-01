@@ -26,6 +26,9 @@ class HomeActivity() : BaseActivity<HomePresenter, HomeView>(), HomeView {
 
     @Inject lateinit var okHttpClient: OkHttpClient
     @Inject lateinit var retrofit: Retrofit
+
+    var placesAdapter: LocationsListAdapter? = null
+
     @BindView(R.id.toolbar) lateinit var toolbar: Toolbar
     @BindView(R.id.btn_add_new_place) lateinit var buttonAdd: FloatingActionButton
     @BindView(R.id.location_list) lateinit var locationsListView: RecyclerView
@@ -43,6 +46,8 @@ class HomeActivity() : BaseActivity<HomePresenter, HomeView>(), HomeView {
         buttonAdd.setOnClickListener {
             startActivity(IntentHelper.createOcrCameraIntent(this@HomeActivity))
         }
+
+
 
         if (findViewById(R.id.location_detail_container) != null) {
             twoPane = true
