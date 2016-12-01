@@ -11,14 +11,19 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.app.backpackr.R
 import com.app.backpackr.api.models.Place
+import com.app.backpackr.dagger.modules.AppModule
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
+import javax.inject.Inject
 
 /**
  * Created by kmikhailovskiy on 25.11.2016.
  */
 
 class LocationsListAdapter(var context: Context, var places: OrderedRealmCollection<Place>) : RealmRecyclerViewAdapter<Place, LocationsListAdapter.LocationHolder>(context, places, true) {
+    @Inject
+    lateinit var systemParamsModule: AppModule
+
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): LocationHolder {
         val itemView = LayoutInflater.from(parent?.context).inflate(R.layout.item_location, parent, false)
         return LocationHolder(itemView)

@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">BackPackR</string>
     <string name="title_location_detail">Location Detail</string>
+    <string name="title_location_capture">Location Capture</string>
+    <string name="locations_list_remove">Remove</string>
+    <string name="locations_list_show">Show</string>
 </resources>

@@ -12,6 +12,9 @@ import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.home.HomePresenter
 import com.app.backpackr.presenters.home.HomeView
 import com.app.backpackr.ui.sections.abs.BaseActivity
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import javax.inject.Inject
 
 /**
  * Created by konstie on 13.11.16.
@@ -21,6 +24,8 @@ class HomeActivity() : BaseActivity<HomePresenter, HomeView>(), HomeView {
     var twoPane = false
     var presenter : HomePresenter? = null
 
+    @Inject lateinit var okHttpClient: OkHttpClient
+    @Inject lateinit var retrofit: Retrofit
     @BindView(R.id.toolbar) lateinit var toolbar: Toolbar
     @BindView(R.id.btn_add_new_place) lateinit var buttonAdd: FloatingActionButton
     @BindView(R.id.location_list) lateinit var locationsListView: RecyclerView
