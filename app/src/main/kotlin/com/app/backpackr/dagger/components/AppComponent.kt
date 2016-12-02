@@ -4,6 +4,7 @@ import android.location.LocationManager
 import com.app.backpackr.BackPackRApp
 import com.app.backpackr.api.repositories.RecognizedLocationsRepositoryImpl
 import com.app.backpackr.dagger.modules.AppModule
+import com.app.backpackr.helpers.rxrealm.OnSubscribeRealm
 import dagger.Component
 import io.realm.Realm
 import javax.inject.Singleton
@@ -16,6 +17,7 @@ import javax.inject.Singleton
 interface AppComponent {
     fun inject(application: BackPackRApp)
     fun inject(recognizedRecognizedLocationsRepositoryImpl: RecognizedLocationsRepositoryImpl)
+    fun inject(onSubscribeRealm: OnSubscribeRealm<*>)
     fun locationManager(): LocationManager
     fun realm(): Realm
 }

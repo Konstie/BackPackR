@@ -47,14 +47,13 @@ class HomeActivity() : BaseActivity<HomePresenter, HomeView>(), HomeView {
             startActivity(IntentHelper.createOcrCameraIntent(this@HomeActivity))
         }
 
-
-
         if (findViewById(R.id.location_detail_container) != null) {
             twoPane = true
         }
     }
 
     override fun onPresenterPrepared(presenter: HomePresenter) {
+
     }
 
     override fun onDestroy() {

@@ -37,6 +37,10 @@ class LocationsListAdapter(var context: Context, var places: OrderedRealmCollect
         holder?.buttonRemove?.setOnClickListener {
             onRemoveButtonClicked(it as Button, position)
         }
+        holder?.buttonShowOnMap?.setOnClickListener {
+            onShowOnMapButtonClicked(it as Button, position)
+        }
+
         // todo: provide graphic header loading implementation
     }
 

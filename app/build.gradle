@@ -40,7 +40,8 @@ kapt {
 
 def supportVersion = '25.0.1'
 def playServicesVersion = '10.0.0'
-def rxVersion = '2.0.0'
+def rxVersion = '1.2.3'
+def rxAndroidVersion = '1.2.1'
 def daggerVersion = '2.7'
 
 dependencies {
@@ -61,8 +62,8 @@ dependencies {
     compile "com.google.android.gms:play-services-maps:$playServicesVersion"
 
     // rx dependencies
-    compile "io.reactivex.rxjava2:rxjava:$rxVersion"
-    compile "io.reactivex.rxjava2:rxandroid:$rxVersion"
+    compile "io.reactivex:rxjava:$rxVersion"
+    compile "io.reactivex:rxandroid:$rxAndroidVersion"
 
     // dependency injection
     compile "com.google.dagger:dagger:$daggerVersion"
