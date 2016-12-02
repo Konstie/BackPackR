@@ -14,39 +14,37 @@ import com.app.backpackr.presenters.abs.PresenterLoader
  * Created by kmikhailovskiy on 23.11.2016.
  */
 
-abstract class BaseActivity<P : Presenter<V>, V> : AppCompatActivity() {
+abstract class BaseActivity<P : Presenter<V>, V> : AppCompatActivity(), LoaderManager.LoaderCallbacks<P> {
     private var presenter: Presenter<V>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        supportLoaderManager.initLoader(loaderId(), null, object : LoaderManager.LoaderCallbacks<P> {
-            override fun onLoadFinished(loader: Loader<P>?, presenter: P) {
-                this@BaseActivity.presenter = presenter
-            }
+        supportLoaderManager.initLoader(loaderId(), null, this)
+    }
 
-            override fun onLoaderReset(loader: Loader<P>?) {
-                this@BaseActivity.presenter = null
-                onPresenterDestroyed()
-            }
+    override fun onLoadFinished(loader: Loader<P>?, presenter: P) {
+        this@BaseActivity.presenter = presenter
+        onPresenterPrepared(presenter)
+    }
 
-            override fun onCreateLoader(id: Int, args: Bundle?): Loader<P> {
-                return PresenterLoader(this@BaseActivity, presenterFactory, tag())
-            }
+    override fun onLoaderReset(loader: Loader<P>?) {
+        this@BaseActivity.presenter = null
+        onPresenterDestroyed()
+    }
 
-        })
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<P> {
+        return PresenterLoader(this@BaseActivity, presenterFactory, tag())
     }
 
     override fun onStart() {
         super.onStart()
-        Log.i(TAG, "onStart-" + tag())
         presenter?.onViewAttached(presenterView)
     }
 
     override fun onStop() {
         presenter?.onViewDetached()
         super.onStop()
-        Log.i(TAG, "onStop-" + tag())
     }
 
     protected abstract fun tag(): String

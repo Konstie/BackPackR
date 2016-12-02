@@ -7,11 +7,13 @@ import android.support.v7.widget.Toolbar
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.app.backpackr.R
+import com.app.backpackr.api.models.Place
 import com.app.backpackr.helpers.IntentHelper
 import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.home.HomePresenter
 import com.app.backpackr.presenters.home.HomeView
 import com.app.backpackr.ui.sections.abs.BaseActivity
+import io.realm.RealmResults
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Inject
@@ -20,9 +22,8 @@ import javax.inject.Inject
  * Created by konstie on 13.11.16.
  */
 class HomeActivity() : BaseActivity<HomePresenter, HomeView>(), HomeView {
-
     var twoPane = false
-    var presenter : HomePresenter? = null
+    var homePresenter: HomePresenter? = null
 
     @Inject lateinit var okHttpClient: OkHttpClient
     @Inject lateinit var retrofit: Retrofit
@@ -40,9 +41,6 @@ class HomeActivity() : BaseActivity<HomePresenter, HomeView>(), HomeView {
         setSupportActionBar(toolbar)
         toolbar.title = title
 
-        presenter = HomePresenter(this)
-        presenter?.onViewAttached(this)
-
         buttonAdd.setOnClickListener {
             startActivity(IntentHelper.createOcrCameraIntent(this@HomeActivity))
         }
@@ -53,12 +51,27 @@ class HomeActivity() : BaseActivity<HomePresenter, HomeView>(), HomeView {
     }
 
     override fun onPresenterPrepared(presenter: HomePresenter) {
+        this.homePresenter = presenter
+        homePresenter?.fetchSavedLocations()
+    }
 
+    override fun onLocationsLoaded(savedLocations: RealmResults<Place>) {
+        placesAdapter = LocationsListAdapter(this, savedLocations, locationClickListener)
+    }
+
+    private object locationClickListener : LocationItemClickListener {
+        override fun onShowGoogleMapsClicked(currentPlace: Place) {
+            // todo: open location screen scrolled to Google Maps view
+        }
+    }
+
+    override fun onLocationsLoadingStopped() {
+        // todo: stop progress bar
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        presenter?.onViewDetached()
+        homePresenter?.onViewDetached()
     }
 
     override fun tag(): String {
