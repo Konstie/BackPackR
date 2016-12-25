@@ -1,6 +1,8 @@
 package com.app.backpackr.dagger.modules
 
+import com.app.backpackr.api.ApiBaseUrls
 import com.app.backpackr.api.ApiHeaders
+import com.app.backpackr.api.models.BaseUrl
 import com.squareup.moshi.Moshi
 
 import javax.inject.Singleton
@@ -17,13 +19,19 @@ import java.util.concurrent.TimeUnit
  */
 
 @Module
-class NetworkModule(private val baseUrl: String) {
+class NetworkModule() {
     val CONNECT_TIMEOUT: Long = 30
 
     @Provides
     @Singleton
     fun provideMoshi(): Moshi {
         return Moshi.Builder().build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideBaseUrl(): BaseUrl {
+        return BaseUrl(ApiBaseUrls.GOOGLE_PLACES.toString())
     }
 
     @Provides
@@ -46,10 +54,10 @@ class NetworkModule(private val baseUrl: String) {
 
     @Provides
     @Singleton
-    fun provideRetrofit(moshi: Moshi, okHttpClient: OkHttpClient): Retrofit {
+    fun provideRetrofit(baseUrl: BaseUrl, okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
                 .addConverterFactory(MoshiConverterFactory.create())
-                .baseUrl(baseUrl)
+                .baseUrl(baseUrl.endPointUrl)
                 .client(okHttpClient)
                 .build()
     }

@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'realm-android'
 
 repositories {
@@ -38,8 +38,8 @@ kapt {
     generateStubs = true
 }
 
-def supportVersion = '25.0.1'
-def playServicesVersion = '10.0.0'
+def supportVersion = '25.1.0'
+def playServicesVersion = '10.0.1'
 def rxVersion = '1.2.3'
 def rxAndroidVersion = '1.2.1'
 def daggerVersion = '2.7'

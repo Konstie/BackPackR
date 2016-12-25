@@ -104,6 +104,7 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
 
     override fun onDestroy() {
         super.onDestroy()
+
         // todo: release the camera detector
     }
 

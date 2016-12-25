@@ -1,7 +1,7 @@
 package com.app.backpackr.api
 
 /**
- * Created by konstie on 12.11.16.
+ * Created by konstie on 25.12.16.
  */
 enum class ApiBaseUrls(private val baseUrl: String) {
     GOOGLE_PLACES("https://maps.googleapis.com/maps/api/place/");
