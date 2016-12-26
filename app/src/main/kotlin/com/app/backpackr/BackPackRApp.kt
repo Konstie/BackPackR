@@ -6,6 +6,7 @@ import com.app.backpackr.dagger.components.DaggerAppComponent
 import com.app.backpackr.dagger.components.DaggerNetworkComponent
 import com.app.backpackr.dagger.components.NetworkComponent
 import com.app.backpackr.dagger.modules.AppModule
+import io.realm.Realm
 
 /**
  * Created by kmikhailovskiy on 01.12.2016.
@@ -19,6 +20,7 @@ class BackPackRApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        Realm.init(this)
         appComponent = DaggerAppComponent.builder()
                 .appModule(AppModule(this))
                 .build()

@@ -4,4 +4,7 @@
     <string name="title_location_capture">Location Capture</string>
     <string name="locations_list_remove">Remove</string>
     <string name="locations_list_map">Map</string>
+    <string name="action_ok">OK</string>
+    <string name="ocr_screen_permission_rationale">You need to grant this permission in order to achieve successful spot info recognition</string>
+    <string name="ocr_screen_not_enough_storage">There is not enough storage on your device</string>
 </resources>
