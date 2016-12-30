@@ -22,7 +22,7 @@ class CameraSourcePreview(context: Context, attributeSet: AttributeSet) : ViewGr
     private var surfaceView: SurfaceView? = null
     private var startRequested: Boolean = false
     private var surfaceAvailable: Boolean = false
-    private var cameraSource: CameraSource? = null
+    private var cameraSource: CustomCameraSource? = null
     private var graphicOverlay: GraphicOverlay<OcrGraphic>? = null
 
     init {
@@ -33,7 +33,7 @@ class CameraSourcePreview(context: Context, attributeSet: AttributeSet) : ViewGr
 
     @RequiresPermission(Manifest.permission.CAMERA)
     @Throws(IOException::class, SecurityException::class)
-    fun start(cameraSource: CameraSource?) {
+    fun start(cameraSource: CustomCameraSource?) {
         if (cameraSource == null) {
             stop()
         }
@@ -48,7 +48,7 @@ class CameraSourcePreview(context: Context, attributeSet: AttributeSet) : ViewGr
 
     @RequiresPermission(Manifest.permission.CAMERA)
     @Throws(IOException::class, SecurityException::class)
-    fun start(cameraSource: CameraSource, overlay: GraphicOverlay<OcrGraphic>) {
+    fun start(cameraSource: CustomCameraSource, overlay: GraphicOverlay<OcrGraphic>) {
         graphicOverlay = overlay
         start(cameraSource)
     }

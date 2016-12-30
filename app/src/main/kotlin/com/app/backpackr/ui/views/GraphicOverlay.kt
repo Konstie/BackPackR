@@ -15,9 +15,9 @@ import java.util.*
 class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private val mLock = Any()
     private var mPreviewWidth: Int = 0
-    private var mWidthScaleFactor = 1.0f
-    private var mPreviewHeight: Int = 0
-    private var mHeightScaleFactor = 1.0f
+    private var mWidthScaleFactor: Float = 1.0f
+    private var mPreviewHeight = 0
+    private var mHeightScaleFactor: Float = 1.0f
     private var mFacing = CameraSource.CAMERA_FACING_BACK
     private val mGraphics = HashSet<T>()
 
@@ -157,8 +157,8 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
 
         synchronized(mLock) {
             if (mPreviewWidth != 0 && mPreviewHeight != 0) {
-                mWidthScaleFactor = canvas.getWidth() as Float / mPreviewWidth.toFloat()
-                mHeightScaleFactor = canvas.getHeight() as Float / mPreviewHeight.toFloat()
+                mWidthScaleFactor = canvas.width / mPreviewWidth.toFloat()
+                mHeightScaleFactor = canvas.width / mPreviewHeight.toFloat()
             }
 
             for (graphic in mGraphics) {

@@ -1,10 +1,12 @@
 package com.app.backpackr.ui.sections.textcapture
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.hardware.Camera
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.design.widget.Snackbar
@@ -14,14 +16,15 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.widget.Toast
-import butterknife.BindView
 import com.app.backpackr.R
+import com.app.backpackr.helpers.Constants
 import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.textcapture.ITextCaptureView
 import com.app.backpackr.presenters.textcapture.TextCapturePresenter
 import com.app.backpackr.textprocessor.OcrDetectorProcessor
 import com.app.backpackr.ui.sections.abs.BaseActivity
 import com.app.backpackr.ui.views.CameraSourcePreview
+import com.app.backpackr.ui.views.CustomCameraSource
 import com.app.backpackr.ui.views.GraphicOverlay
 import com.app.backpackr.ui.views.OcrGraphic
 import com.google.android.gms.common.ConnectionResult
@@ -42,19 +45,29 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
     val TEXT_BLOCK_OBJECT = "TEXT_BLOCK_OBJECT"
 
     var presenter: TextCapturePresenter? = null
-    lateinit var cameraSource: CameraSource
     var gestureDetector: GestureDetector? = null
     var scaleGestureDetector: ScaleGestureDetector? = null
-    @BindView(R.id.graphic_overlay) lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
-    @BindView(R.id.camera_preview) lateinit var cameraPreview: CameraSourcePreview
+    lateinit var cameraSource: CustomCameraSource
+    lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
+    lateinit var cameraPreview: CameraSourcePreview
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_capture_text)
 
-        val cameraPermissionStatus = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+        cameraPreview = findViewById(R.id.camera_preview) as CameraSourcePreview
+        graphicOverlay = findViewById(R.id.graphic_overlay) as GraphicOverlay<OcrGraphic>
+
+        val autoFocus = true
+        val useFlash = false
+
+        val cameraPermissionStatus = cameraPermissionStatus()
         if (cameraPermissionStatus == PackageManager.PERMISSION_GRANTED) {
-            createCameraSource()
+            createCameraSource(autoFocus, useFlash)
         } else {
             requestCameraPermission()
         }
@@ -63,21 +76,7 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
         scaleGestureDetector = ScaleGestureDetector(this, scaleListener)
     }
 
-    private fun requestCameraPermission() {
-        Log.w(tag(), "requestCameraPermission called...")
-        val permissions = arrayOf(Manifest.permission.CAMERA)
-        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-            ActivityCompat.requestPermissions(this, permissions, RC_CAMERA_PERMISSION)
-            return
-        }
-
-        Snackbar.make(graphicOverlay, R.string.ocr_screen_permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.action_ok, {
-                    ActivityCompat.requestPermissions(this@TextCaptureActivity, permissions, RC_CAMERA_PERMISSION)
-                }).show()
-    }
-
-    fun createCameraSource() {
+    fun createCameraSource(autoFocus: Boolean, useFlash: Boolean) {
         val context = applicationContext
         val textRecognizer = TextRecognizer.Builder(context).build()
         textRecognizer.setProcessor(OcrDetectorProcessor(graphicOverlay))
@@ -93,10 +92,13 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
                 Log.w(tag(), "Yout device has low storage")
             }
         } else {
-            cameraSource = CameraSource.Builder(applicationContext, textRecognizer)
+            Log.d(tag(), "CameraSource initialization started!")
+            cameraSource = CustomCameraSource.Builder(applicationContext, textRecognizer)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
                     .setRequestedPreviewSize(1280, 1024)
                     .setRequestedFps(15.0f)
+                    .setFlashMode(if (useFlash) Camera.Parameters.FLASH_MODE_TORCH else null)
+                    .setFocusMode(if (autoFocus) Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE else null)
                     .build()
         }
     }
@@ -114,6 +116,20 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
         }
     }
 
+    private fun requestCameraPermission() {
+        Log.w(tag(), "requestCameraPermission called...")
+        val permissions = arrayOf(Manifest.permission.CAMERA)
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+            ActivityCompat.requestPermissions(this, permissions, RC_CAMERA_PERMISSION)
+            return
+        }
+
+        Snackbar.make(graphicOverlay, R.string.ocr_screen_permission_rationale, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.action_ok, {
+                    ActivityCompat.requestPermissions(this@TextCaptureActivity, permissions, RC_CAMERA_PERMISSION)
+                }).show()
+    }
+
     private fun onTap(rawX: Float, rawY: Float): Boolean {
         val ocrGraphic = graphicOverlay.getGraphicAtLocation(rawX, rawY)
         val text: TextBlock? = ocrGraphic?.textBlock?: return false
@@ -126,12 +142,16 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
 
     override fun onResume() {
         super.onResume()
-        startCameraSource()
+        if (cameraPermissionStatus() == PackageManager.PERMISSION_GRANTED) {
+            startCameraSource()
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        cameraPreview.stop()
+        if (cameraPreview != null) {
+            cameraPreview.stop()
+        }
     }
 
     private val captureGestureListener = object : GestureDetector.SimpleOnGestureListener() {
@@ -163,13 +183,31 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
         }
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(tag(), "Camera permission was granted!")
-            createCameraSource()
+            val autoFocus = intent.getBooleanExtra(Constants.EXTRA_AUTO_FOCUS, false)
+            val useFlash = intent.getBooleanExtra(Constants.EXTRA_USE_FLASH, false)
+            createCameraSource(autoFocus, useFlash)
             return
         }
         Log.d(tag(), "Permission was not granted!")
-        DialogInterface.OnClickListener { dialogInterface, i ->
+        val dialogCallback = DialogInterface.OnClickListener { dialogInterface, i ->
             finish()
         }
+
+        val dialogBuilder = AlertDialog.Builder(this);
+        dialogBuilder.setTitle(R.string.ocr_screen_permission_title)
+                .setMessage(R.string.ocr_screen_permission_rationale)
+                .setPositiveButton(R.string.action_ok, dialogCallback)
+                .show()
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        val scaleGestureDetectorReady = scaleGestureDetector?.onTouchEvent(event)
+        val gestureDetectorReady = gestureDetector?.onTouchEvent(event)
+        return scaleGestureDetectorReady?:false || gestureDetectorReady?:false || super.onTouchEvent(event)
+    }
+
+    private fun cameraPermissionStatus(): Int {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
     }
 
     override fun onPresenterPrepared(presenter: TextCapturePresenter) {
@@ -178,7 +216,9 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
 
     override fun onDestroy() {
         super.onDestroy()
-        cameraPreview.release()
+        if (cameraPreview != null) {
+            cameraPreview.release()
+        }
     }
 
     override fun tag(): String {

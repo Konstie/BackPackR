@@ -26,6 +26,4 @@ class BackPackRApp : Application() {
                 .build()
         networkComponent = DaggerNetworkComponent.builder().build()
     }
-
-
 }
