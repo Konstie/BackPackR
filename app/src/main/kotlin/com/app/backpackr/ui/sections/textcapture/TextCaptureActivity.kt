@@ -8,20 +8,25 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.hardware.Camera
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.util.Log
+import android.util.SparseArray
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
+import android.view.View
 import android.widget.Toast
+import butterknife.BindView
+import butterknife.ButterKnife
 import com.app.backpackr.R
 import com.app.backpackr.helpers.Constants
 import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.textcapture.ITextCaptureView
 import com.app.backpackr.presenters.textcapture.TextCapturePresenter
 import com.app.backpackr.textprocessor.OcrDetectorProcessor
+import com.app.backpackr.textprocessor.TextDetectionListener
 import com.app.backpackr.ui.sections.abs.BaseActivity
 import com.app.backpackr.ui.views.CameraSourcePreview
 import com.app.backpackr.ui.views.CustomCameraSource
@@ -39,28 +44,29 @@ import java.io.IOException
  * Created by kmikhailovskiy on 23.11.2016.
  */
 
-class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureView>(), ITextCaptureView {
+class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>(), ITextCaptureView, View.OnClickListener {
     val RC_CAMERA_PERMISSION = 2
     val RC_PLAY_SERVICES = 9001
     val TEXT_BLOCK_OBJECT = "TEXT_BLOCK_OBJECT"
 
     var presenter: TextCapturePresenter? = null
     var gestureDetector: GestureDetector? = null
+    var textDetectorProcessor: OcrDetectorProcessor? = null
     var scaleGestureDetector: ScaleGestureDetector? = null
-    lateinit var cameraSource: CustomCameraSource
-    lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
-    lateinit var cameraPreview: CameraSourcePreview
+    var textRecognizer: TextRecognizer? = null
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
-    }
+    lateinit var cameraSource: CustomCameraSource
+    lateinit @BindView(R.id.graphic_overlay) var graphicOverlay: GraphicOverlay<OcrGraphic>
+    lateinit @BindView(R.id.camera_preview) var cameraPreview: CameraSourcePreview
+    lateinit @BindView(R.id.button_proceed) var buttonProceed: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_capture_text)
+        ButterKnife.bind(this)
 
-        cameraPreview = findViewById(R.id.camera_preview) as CameraSourcePreview
-        graphicOverlay = findViewById(R.id.graphic_overlay) as GraphicOverlay<OcrGraphic>
+        presenter = TextCapturePresenter(this@TextCaptureActivity)
+        presenter?.onViewAttached(this)
 
         val autoFocus = true
         val useFlash = false
@@ -78,10 +84,15 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
 
     fun createCameraSource(autoFocus: Boolean, useFlash: Boolean) {
         val context = applicationContext
-        val textRecognizer = TextRecognizer.Builder(context).build()
-        textRecognizer.setProcessor(OcrDetectorProcessor(graphicOverlay))
+        textRecognizer = TextRecognizer.Builder(context).build()
+        textDetectorProcessor = OcrDetectorProcessor(graphicOverlay, object: TextDetectionListener {
+            override fun onTextBlocksReceived(detectedItems: SparseArray<TextBlock>) {
+                presenter?.addDetections(detectedItems)
+            }
+        })
+        textRecognizer?.setProcessor(textDetectorProcessor)
 
-        if (!textRecognizer.isOperational) {
+        if (textRecognizer?.isOperational == false) {
             Log.w(tag(), "Camera detector dependencies are not available")
 
             val lowStorageFilter = IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW)
@@ -102,6 +113,7 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
                     .build()
         }
     }
+
 
     private fun startCameraSource() {
         val code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(applicationContext)
@@ -149,8 +161,12 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
 
     override fun onPause() {
         super.onPause()
-        if (cameraPreview != null) {
-            cameraPreview.stop()
+        cameraPreview.stop()
+    }
+
+    override fun onClick(view: View?) {
+        if (view == buttonProceed) {
+            presenter?.onProcessCurrentImagePressed()
         }
     }
 
@@ -166,8 +182,8 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
             return true
         }
 
-        override fun onScaleEnd(p0: ScaleGestureDetector?) {
-            // todo: do zoom
+        override fun onScaleEnd(detector: ScaleGestureDetector?) {
+            cameraSource.doZoom(detector?.scaleFactor?: 0.0f)
         }
 
         override fun onScale(p0: ScaleGestureDetector?): Boolean {
@@ -216,9 +232,10 @@ class TextCaptureActivity() : BaseActivity<TextCapturePresenter, ITextCaptureVie
 
     override fun onDestroy() {
         super.onDestroy()
-        if (cameraPreview != null) {
-            cameraPreview.release()
-        }
+        textDetectorProcessor?.textDetectionListener = null
+        cameraPreview.release()
+        presenter?.onViewDetached()
+        presenter?.onDestroyed()
     }
 
     override fun tag(): String {
