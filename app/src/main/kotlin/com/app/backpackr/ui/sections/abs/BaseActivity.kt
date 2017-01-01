@@ -37,16 +37,6 @@ abstract class BaseActivity<P : Presenter<V>, V> : AppCompatActivity(), LoaderMa
         return PresenterLoader(this@BaseActivity, presenterFactory, tag())
     }
 
-    override fun onStart() {
-        super.onStart()
-        presenter?.onViewAttached(presenterView)
-    }
-
-    override fun onStop() {
-        presenter?.onViewDetached()
-        super.onStop()
-    }
-
     protected abstract fun tag(): String
 
     /**

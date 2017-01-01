@@ -228,6 +228,7 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
 
     override fun onPresenterPrepared(presenter: TextCapturePresenter) {
         this@TextCaptureActivity.presenter = presenter
+        this@TextCaptureActivity.presenter?.onViewAttached(this)
     }
 
     override fun onDestroy() {

@@ -52,6 +52,7 @@ class HomeActivity() : BaseActivity<HomePresenter, HomeView>(), HomeView {
 
     override fun onPresenterPrepared(presenter: HomePresenter) {
         this.homePresenter = presenter
+        homePresenter?.onViewAttached(this)
         homePresenter?.fetchSavedLocations()
     }
 

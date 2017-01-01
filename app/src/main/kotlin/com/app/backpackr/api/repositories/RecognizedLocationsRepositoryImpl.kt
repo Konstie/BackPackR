@@ -2,7 +2,6 @@ package com.app.backpackr.api.repositories
 
 import android.content.Context
 import com.app.backpackr.BackPackRApp
-import com.app.backpackr.api.models.Location
 import com.app.backpackr.api.models.Place
 import com.app.backpackr.dagger.components.AppComponent
 import io.realm.Realm

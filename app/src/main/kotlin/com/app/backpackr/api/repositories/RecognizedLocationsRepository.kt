@@ -1,6 +1,5 @@
 package com.app.backpackr.api.repositories
 
-import com.app.backpackr.api.models.Location
 import com.app.backpackr.api.models.Place
 import io.realm.RealmResults
 import rx.Observable
