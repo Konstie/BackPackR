@@ -3,8 +3,6 @@ package com.app.backpackr
 import android.app.Application
 import com.app.backpackr.dagger.components.AppComponent
 import com.app.backpackr.dagger.components.DaggerAppComponent
-import com.app.backpackr.dagger.components.DaggerNetworkComponent
-import com.app.backpackr.dagger.components.NetworkComponent
 import com.app.backpackr.dagger.modules.AppModule
 import io.realm.Realm
 
@@ -15,7 +13,6 @@ import io.realm.Realm
 class BackPackRApp : Application() {
     companion object {
         lateinit var appComponent: AppComponent
-        lateinit var networkComponent: NetworkComponent
     }
 
     override fun onCreate() {
@@ -24,6 +21,5 @@ class BackPackRApp : Application() {
         appComponent = DaggerAppComponent.builder()
                 .appModule(AppModule(this))
                 .build()
-        networkComponent = DaggerNetworkComponent.builder().build()
     }
 }

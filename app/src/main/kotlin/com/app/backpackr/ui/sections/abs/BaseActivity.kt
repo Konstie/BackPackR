@@ -3,18 +3,12 @@ package com.app.backpackr.ui.sections.abs
 import android.os.Bundle
 import android.support.v4.app.LoaderManager
 import android.support.v4.content.Loader
-import android.support.v7.app.AppCompatActivity
-import android.util.Log
 
 import com.app.backpackr.presenters.abs.Presenter
 import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.abs.PresenterLoader
 
-/**
- * Created by kmikhailovskiy on 23.11.2016.
- */
-
-abstract class BaseActivity<P : Presenter<V>, V> : AppCompatActivity(), LoaderManager.LoaderCallbacks<P> {
+abstract class BaseActivity<P : Presenter<V>, V> : FullScreenActivity(), LoaderManager.LoaderCallbacks<P> {
     private var presenter: Presenter<V>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

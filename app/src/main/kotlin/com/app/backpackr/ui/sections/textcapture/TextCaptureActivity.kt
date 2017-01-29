@@ -28,6 +28,7 @@ import com.app.backpackr.presenters.textcapture.TextCapturePresenter
 import com.app.backpackr.textprocessor.OcrDetectorProcessor
 import com.app.backpackr.textprocessor.TextDetectionListener
 import com.app.backpackr.ui.sections.abs.BaseActivity
+import com.app.backpackr.ui.sections.loading.LoadingActivity
 import com.app.backpackr.ui.views.CameraSourcePreview
 import com.app.backpackr.ui.views.CustomCameraSource
 import com.app.backpackr.ui.views.GraphicOverlay
@@ -39,10 +40,6 @@ import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
 import java.io.IOException
-
-/**
- * Created by kmikhailovskiy on 23.11.2016.
- */
 
 class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>(), ITextCaptureView, View.OnClickListener {
     val RC_CAMERA_PERMISSION = 2
@@ -62,6 +59,7 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setupFullScreen()
         setContentView(R.layout.activity_capture_text)
         ButterKnife.bind(this)
 
@@ -80,6 +78,7 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
 
         gestureDetector = GestureDetector(this, captureGestureListener)
         scaleGestureDetector = ScaleGestureDetector(this, scaleListener)
+        buttonProceed.setOnClickListener(this)
     }
 
     fun createCameraSource(autoFocus: Boolean, useFlash: Boolean) {
@@ -224,6 +223,12 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
 
     private fun cameraPermissionStatus(): Int {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+    }
+
+    override fun onPlacesLoadingStarted() {
+        val loadingIntent = Intent(this, LoadingActivity::class.java)
+        loadingIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(loadingIntent)
     }
 
     override fun onPresenterPrepared(presenter: TextCapturePresenter) {

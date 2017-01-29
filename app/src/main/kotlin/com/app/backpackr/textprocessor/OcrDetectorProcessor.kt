@@ -18,7 +18,7 @@ class OcrDetectorProcessor(var graphicOverlay: GraphicOverlay<OcrGraphic>, var t
         graphicOverlay.clear()
         val textBlocks = detections?.detectedItems
         val textBlocksCount = textBlocks?.size() ?: 0
-        for (i in 0..textBlocksCount) {
+        for (i in 0 until textBlocksCount) {
             val item = textBlocks?.valueAt(i)
             Log.d(TAG, "Text item: " + item?.value)
             val graphic = OcrGraphic(graphicOverlay, item)

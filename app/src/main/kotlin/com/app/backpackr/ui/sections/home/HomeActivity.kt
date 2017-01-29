@@ -21,7 +21,7 @@ import javax.inject.Inject
 /**
  * Created by konstie on 13.11.16.
  */
-class HomeActivity() : BaseActivity<HomePresenter, HomeView>(), HomeView {
+class HomeActivity : BaseActivity<HomePresenter, HomeView>(), HomeView {
     var twoPane = false
     var homePresenter: HomePresenter? = null
 

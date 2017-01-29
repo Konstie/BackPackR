@@ -33,13 +33,12 @@ class TextCapturePresenter(val context: Context) : Presenter<ITextCaptureView> {
         val signsProcessingIntent = Intent(context, PlacesRecognitionService::class.java)
         signsProcessingIntent.putStringArrayListExtra(Constants.EXTRA_CAPTURED_SIGNS, textDetectionsList)
         context.startService(signsProcessingIntent)
+        view?.onPlacesLoadingStarted()
     }
 
     fun convertDetectionsArrayToList(textDetections: SparseArray<TextBlock>): ArrayList<String> {
-        val detectionsList = ArrayList<String>()
-        for (index in 0..textDetections.size()) {
-            detectionsList.add(textDetections[index].value)
-        }
+        val detectionsList = (0 until textDetections.size())
+                        .mapTo(ArrayList<String>()) { textDetections[it].value }
         return detectionsList
     }
 

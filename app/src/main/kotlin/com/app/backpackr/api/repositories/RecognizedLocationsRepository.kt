@@ -1,6 +1,7 @@
 package com.app.backpackr.api.repositories
 
 import com.app.backpackr.api.models.Place
+import com.app.backpackr.api.models.dto.LocationDTO
 import io.realm.RealmResults
 import rx.Observable
 
@@ -9,6 +10,8 @@ import rx.Observable
  */
 
 interface RecognizedLocationsRepository {
-    fun addLocation(title: String, country: String, city: String, location: Location, address: String): Observable<Place>
+    fun addLocation(title: String, country: String, city: String, location: LocationDTO, address: String): Observable<Place>
+    fun removePlace(place: Place)
+    fun updatePlace(place: Place)
     fun recognizedLocations(): Observable<RealmResults<Place>>
 }

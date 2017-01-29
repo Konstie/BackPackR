@@ -3,6 +3,7 @@ package com.app.backpackr.api.repositories
 import android.content.Context
 import com.app.backpackr.BackPackRApp
 import com.app.backpackr.api.models.Place
+import com.app.backpackr.api.models.dto.LocationDTO
 import com.app.backpackr.dagger.components.AppComponent
 import io.realm.Realm
 import io.realm.RealmResults
@@ -22,18 +23,25 @@ class RecognizedLocationsRepositoryImpl(var context: Context) : RecognizedLocati
         realmComponent.inject(this)
     }
 
-    override fun addLocation(title: String, country: String, city: String, location: Location, address: String): Observable<Place> {
+    override fun addLocation(title: String, country: String, city: String, location: LocationDTO, address: String): Observable<Place> {
         return Observable.create<Place> {
             realmDatabase.beginTransaction()
             val newPlace = Place()
             newPlace.title = title
             newPlace.country = country
             newPlace.city = city
-            newPlace.location = location
+            newPlace.lat = location.latitude
+            newPlace.long = location.longitude
             newPlace.address = address
             realmDatabase.copyFromRealm(newPlace)
             realmDatabase.commitTransaction()
         }
+    }
+
+    override fun removePlace(place: Place) {
+    }
+
+    override fun updatePlace(place: Place) {
     }
 
     override fun recognizedLocations(): Observable<RealmResults<Place>> {

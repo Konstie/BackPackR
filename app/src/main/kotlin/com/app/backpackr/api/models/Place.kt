@@ -33,4 +33,12 @@ open class Place : RealmObject() {
                 .appendQueryParameter(ApiParams.KEY, apiKey)
         return uriBuilder.toString()
     }
+
+    override fun toString(): String {
+        return "Place (title = $title, city = $city, country = $country, address = $address, " +
+                "photoReference = $photoReference, placeDetailsReference = $placeDetailsReference, " +
+                "long = $long, lat = $lat)"
+    }
+
+
 }
