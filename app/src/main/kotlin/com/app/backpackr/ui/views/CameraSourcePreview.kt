@@ -5,7 +5,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.SurfaceView
 import android.view.ViewGroup
-import com.google.android.gms.vision.CameraSource
 import android.support.annotation.RequiresPermission
 import java.io.IOException
 import android.content.res.Configuration
