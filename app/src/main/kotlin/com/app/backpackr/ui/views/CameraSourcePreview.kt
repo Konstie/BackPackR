@@ -12,10 +12,6 @@ import android.content.res.Configuration
 import android.util.Log
 import android.view.SurfaceHolder
 
-/**
- * Created by kmikhailovskiy on 28.11.2016.
- */
-
 class CameraSourcePreview(context: Context, attributeSet: AttributeSet) : ViewGroup(context, attributeSet) {
     val TAG = "CameraSourcePreview"
 

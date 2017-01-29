@@ -24,15 +24,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LocationDetailActivity"
-            android:label="@string/title_location_detail"
-            android:parentActivityName=".HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.app.backpackr.HomeActivity" />
-        </activity>
-        <activity
             android:name=".ui.sections.textcapture.TextCaptureActivity"
             android:label="@string/title_location_capture"
             android:parentActivityName=".HomeActivity"

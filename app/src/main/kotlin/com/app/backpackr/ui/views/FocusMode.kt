@@ -4,9 +4,6 @@ import android.hardware.Camera
 import android.support.annotation.StringDef
 import java.lang.annotation.RetentionPolicy
 
-/**
- * Created by konstie on 29.12.16.
- */
 @StringDef(
         Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE,
         Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO,
