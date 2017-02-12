@@ -1,16 +1,14 @@
 package com.app.backpackr.dagger.components
 
-import android.location.LocationManager
 import com.app.backpackr.BackPackRApp
-import com.app.backpackr.api.models.BaseUrl
 import com.app.backpackr.api.repositories.RecognizedLocationsRepositoryImpl
 import com.app.backpackr.dagger.modules.AppModule
 import com.app.backpackr.dagger.modules.NetworkModule
+import com.app.backpackr.presenters.loading.LoadingPresenter
 import com.app.backpackr.textprocessor.services.PlacesRecognitionService
+import com.app.backpackr.ui.sections.abs.BaseActivity
+import com.app.backpackr.ui.sections.abs.FullScreenActivity
 import dagger.Component
-import io.realm.Realm
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
 import javax.inject.Singleton
 
 /**
@@ -20,11 +18,8 @@ import javax.inject.Singleton
 @Singleton
 interface AppComponent {
     fun inject(application: BackPackRApp)
+    fun inject(baseActivity: FullScreenActivity)
     fun inject(recognizedRecognizedLocationsRepositoryImpl: RecognizedLocationsRepositoryImpl)
     fun inject(placesRecognitionService: PlacesRecognitionService)
-    fun locationManager(): LocationManager
-    fun realm(): Realm
-    fun baseUrl(): BaseUrl
-    fun okHttpClient(): OkHttpClient
-    fun retrofit(): Retrofit
+    fun inject(loadingPresenter: LoadingPresenter)
 }

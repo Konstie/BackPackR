@@ -4,6 +4,7 @@ import android.content.Context
 import android.location.LocationManager
 
 import com.app.backpackr.BackPackRApp
+import com.app.backpackr.helpers.ActivitiesTracker
 
 import javax.inject.Singleton
 
@@ -44,6 +45,12 @@ class AppModule(private val application: BackPackRApp) {
     @Singleton
     fun provideRealm(): Realm {
         return Realm.getInstance(getCustomRealmConfiguration())
+    }
+
+    @Provides
+    @Singleton
+    fun provideActivityTracker(): ActivitiesTracker {
+        return ActivitiesTracker()
     }
 
     private fun getCustomRealmConfiguration(): RealmConfiguration {

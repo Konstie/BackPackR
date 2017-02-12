@@ -18,12 +18,9 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Inject
 
-/**
- * Created by konstie on 13.11.16.
- */
 class HomeActivity : BaseActivity<HomePresenter, HomeView>(), HomeView {
-    var twoPane = false
-    var homePresenter: HomePresenter? = null
+    private var twoPane = false
+    private var homePresenter: HomePresenter? = null
 
     @Inject lateinit var okHttpClient: OkHttpClient
     @Inject lateinit var retrofit: Retrofit
@@ -40,10 +37,11 @@ class HomeActivity : BaseActivity<HomePresenter, HomeView>(), HomeView {
         ButterKnife.bind(this)
         setSupportActionBar(toolbar)
         toolbar.title = title
+        buttonAdd.setOnClickListener { onPhotoButtonClicked() }
+    }
 
-        buttonAdd.setOnClickListener {
-            startActivity(IntentHelper.createOcrCameraIntent(this@HomeActivity))
-        }
+    private fun onPhotoButtonClicked() {
+        startActivity(IntentHelper.createOcrCameraIntent(this@HomeActivity))
     }
 
     override fun onPresenterPrepared(presenter: HomePresenter) {
@@ -65,6 +63,8 @@ class HomeActivity : BaseActivity<HomePresenter, HomeView>(), HomeView {
     override fun onLocationsLoadingStopped() {
         // todo: stop progress bar
     }
+
+    override fun onPermissionsGranted(requestCode: Int) {}
 
     override fun onDestroy() {
         super.onDestroy()

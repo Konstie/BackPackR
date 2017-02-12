@@ -5,11 +5,18 @@
     <string name="locations_list_remove">Remove</string>
     <string name="locations_list_map">Map</string>
     <string name="action_ok">OK</string>
+    <string name="action_accept">ACCEPT</string>
+    <string name="action_grant">GRANT</string>
     <string name="ocr_screen_permission_title">Camera permission</string>
     <string name="ocr_screen_permission_rationale">You need to grant this permission in order to achieve successful spot info recognition</string>
     <string name="ocr_screen_not_enough_storage">There is not enough storage on your device</string>
     <string name="loading_screen_primary_label">Loading place info…</string>
     <string name="loading_screen_fetched_location">Fetched your location: %1$s</string>
     <string name="loading_screen_fetched_place_info">Fetched sought place info! Moving on…</string>
+    <string name="notification_title_retrieved_place_info">Found info about %1$d %2$s</string>
+    <string name="notification_title_could_not_find_places">Could not find places with a similar title</string>
+    <string name="permission_warning">Please, grant permission for %1$d</string>
+    <string name="place">place</string>
+    <string name="places">places</string>
     <string name="google_places_api_key">AIzaSyARi8Lhbl7R11mTVLsheKVdkLb5oSjd1ro</string>
 </resources>

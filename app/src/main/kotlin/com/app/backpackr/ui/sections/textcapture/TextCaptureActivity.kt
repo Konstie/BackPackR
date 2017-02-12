@@ -1,16 +1,11 @@
 package com.app.backpackr.ui.sections.textcapture
 
 import android.Manifest
-import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.hardware.Camera
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
-import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.util.SparseArray
 import android.view.GestureDetector
@@ -22,13 +17,14 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.app.backpackr.R
 import com.app.backpackr.helpers.Constants
+import com.app.backpackr.helpers.IntentHelper
+import com.app.backpackr.helpers.RuntimePermissionsHelper
 import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.textcapture.ITextCaptureView
 import com.app.backpackr.presenters.textcapture.TextCapturePresenter
 import com.app.backpackr.textprocessor.OcrDetectorProcessor
 import com.app.backpackr.textprocessor.TextDetectionListener
 import com.app.backpackr.ui.sections.abs.BaseActivity
-import com.app.backpackr.ui.sections.loading.LoadingActivity
 import com.app.backpackr.ui.views.CameraSourcePreview
 import com.app.backpackr.ui.views.CustomCameraSource
 import com.app.backpackr.ui.views.GraphicOverlay
@@ -40,17 +36,19 @@ import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
 import java.io.IOException
+import java.util.*
 
 class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>(), ITextCaptureView, View.OnClickListener {
-    val RC_CAMERA_PERMISSION = 2
-    val RC_PLAY_SERVICES = 9001
-    val TEXT_BLOCK_OBJECT = "TEXT_BLOCK_OBJECT"
+    private val RC_CAMERA_PERMISSION = 2
+    private val RC_PLAY_SERVICES = 9001
+    private val TEXT_BLOCK_OBJECT = "TEXT_BLOCK_OBJECT"
+    private val TAG = TextCaptureActivity::class.java.simpleName
 
-    var presenter: TextCapturePresenter? = null
-    var gestureDetector: GestureDetector? = null
-    var textDetectorProcessor: OcrDetectorProcessor? = null
-    var scaleGestureDetector: ScaleGestureDetector? = null
-    var textRecognizer: TextRecognizer? = null
+    private var presenter: TextCapturePresenter? = null
+    private var gestureDetector: GestureDetector? = null
+    private var textDetectorProcessor: OcrDetectorProcessor? = null
+    private var scaleGestureDetector: ScaleGestureDetector? = null
+    private var textRecognizer: TextRecognizer? = null
 
     lateinit var cameraSource: CustomCameraSource
     lateinit @BindView(R.id.graphic_overlay) var graphicOverlay: GraphicOverlay<OcrGraphic>
@@ -69,11 +67,10 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
         val autoFocus = true
         val useFlash = false
 
-        val cameraPermissionStatus = cameraPermissionStatus()
-        if (cameraPermissionStatus == PackageManager.PERMISSION_GRANTED) {
+        if (RuntimePermissionsHelper.checkCameraPermission(this@TextCaptureActivity)) {
             createCameraSource(autoFocus, useFlash)
         } else {
-            requestCameraPermission()
+            requestAppPermissions(arrayOf(Manifest.permission.CAMERA), R.string.permission_warning, Constants.PermissionCodes.CAMERA_REQUEST_CODE)
         }
 
         gestureDetector = GestureDetector(this, captureGestureListener)
@@ -86,6 +83,7 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
         textRecognizer = TextRecognizer.Builder(context).build()
         textDetectorProcessor = OcrDetectorProcessor(graphicOverlay, object: TextDetectionListener {
             override fun onTextBlocksReceived(detectedItems: SparseArray<TextBlock>) {
+                Log.d(TAG, "onTextBlocksReceived: " + detectedItems.size())
                 presenter?.addDetections(detectedItems)
             }
         })
@@ -127,20 +125,6 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
         }
     }
 
-    private fun requestCameraPermission() {
-        Log.w(tag(), "requestCameraPermission called...")
-        val permissions = arrayOf(Manifest.permission.CAMERA)
-        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-            ActivityCompat.requestPermissions(this, permissions, RC_CAMERA_PERMISSION)
-            return
-        }
-
-        Snackbar.make(graphicOverlay, R.string.ocr_screen_permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.action_ok, {
-                    ActivityCompat.requestPermissions(this@TextCaptureActivity, permissions, RC_CAMERA_PERMISSION)
-                }).show()
-    }
-
     private fun onTap(rawX: Float, rawY: Float): Boolean {
         val ocrGraphic = graphicOverlay.getGraphicAtLocation(rawX, rawY)
         val text: TextBlock? = ocrGraphic?.textBlock?: return false
@@ -153,7 +137,7 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
 
     override fun onResume() {
         super.onResume()
-        if (cameraPermissionStatus() == PackageManager.PERMISSION_GRANTED) {
+        if (RuntimePermissionsHelper.checkCameraPermission(this)) {
             startCameraSource()
         }
     }
@@ -190,29 +174,15 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode != RC_CAMERA_PERMISSION) {
+    override fun onPermissionsGranted(requestCode: Int) {
+        if (requestCode != Constants.PermissionCodes.CAMERA_REQUEST_CODE) {
             Log.d(tag(), "Something has gone wrong with permission result: " + requestCode)
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
             return
         }
-        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Log.d(tag(), "Camera permission was granted!")
-            val autoFocus = intent.getBooleanExtra(Constants.EXTRA_AUTO_FOCUS, false)
-            val useFlash = intent.getBooleanExtra(Constants.EXTRA_USE_FLASH, false)
-            createCameraSource(autoFocus, useFlash)
-            return
-        }
-        Log.d(tag(), "Permission was not granted!")
-        val dialogCallback = DialogInterface.OnClickListener { dialogInterface, i ->
-            finish()
-        }
-
-        val dialogBuilder = AlertDialog.Builder(this);
-        dialogBuilder.setTitle(R.string.ocr_screen_permission_title)
-                .setMessage(R.string.ocr_screen_permission_rationale)
-                .setPositiveButton(R.string.action_ok, dialogCallback)
-                .show()
+        Log.d(tag(), "Camera permission was granted!")
+        val autoFocus = intent.getBooleanExtra(Constants.EXTRA_AUTO_FOCUS, false)
+        val useFlash = intent.getBooleanExtra(Constants.EXTRA_USE_FLASH, false)
+        createCameraSource(autoFocus, useFlash)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -221,14 +191,9 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
         return scaleGestureDetectorReady?:false || gestureDetectorReady?:false || super.onTouchEvent(event)
     }
 
-    private fun cameraPermissionStatus(): Int {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-    }
-
-    override fun onPlacesLoadingStarted() {
-        val loadingIntent = Intent(this, LoadingActivity::class.java)
-        loadingIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(loadingIntent)
+    override fun onCapturedDataInitialized(capturedLabels: ArrayList<String>?) {
+        startActivity(IntentHelper.createLoadingIntent(this, capturedLabels ?: ArrayList<String>()))
+        finish()
     }
 
     override fun onPresenterPrepared(presenter: TextCapturePresenter) {

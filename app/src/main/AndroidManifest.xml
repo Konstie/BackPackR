@@ -5,6 +5,9 @@
     <uses-feature android:name="android.hardware.camera" />
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".BackPackRApp"
@@ -26,17 +29,24 @@
         <activity
             android:name=".ui.sections.textcapture.TextCaptureActivity"
             android:label="@string/title_location_capture"
-            android:parentActivityName=".HomeActivity"
+            android:parentActivityName=".ui.sections.home.HomeActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.app.backpackr.HomeActivity" />
+                android:value="com.app.backpackr.ui.sections.home.HomeActivity" />
         </activity>
         <activity
             android:name=".ui.sections.loading.LoadingActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.sections.details.PlacesDetailsActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        <service android:name=".textprocessor.services.PlacesRecognitionService" />
+        <service
+            android:name=".textprocessor.services.PlacesRecognitionService">
+        </service>
+
+        <receiver android:name=".ui.sections.loading.LoadingActivity$PlacesReceiver"/>
     </application>
 
 </manifest>

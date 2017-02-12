@@ -1,13 +1,19 @@
 package com.app.backpackr.textprocessor.services
 
 import android.app.IntentService
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.support.v4.app.NotificationManagerCompat
+import android.support.v4.app.TaskStackBuilder
 import android.support.v4.content.LocalBroadcastManager
+import android.support.v7.app.NotificationCompat
 import android.util.Log
 import com.app.backpackr.BackPackRApp
 import com.app.backpackr.R
@@ -15,80 +21,54 @@ import com.app.backpackr.api.models.Place
 import com.app.backpackr.api.models.dto.PlaceDTO
 import com.app.backpackr.api.services.PlacesRetrievalService
 import com.app.backpackr.helpers.Actions
+import com.app.backpackr.helpers.ActivitiesTracker
 import com.app.backpackr.helpers.Constants
+import com.app.backpackr.ui.sections.details.PlacesDetailsActivity
 import retrofit2.Retrofit
 import rx.Observable
 import java.util.*
 import javax.inject.Inject
 
 class PlacesRecognitionService : IntentService(PlacesRecognitionService::class.java.name) {
-    val TAG = PlacesRecognitionService::class.java.name
-    val LOCATION_REFRESH_TIME = 5000L
-    val LOCATION_REFRESH_DISTANCE = 10f
-    val PLACES_NEARBY_RADIUS = 5000
-    var detectedSignsList: List<String>? = null
+    private val TAG = PlacesRecognitionService::class.java.name
 
-    lateinit @Inject var locationManager: LocationManager
+    private val PLACES_NEARBY_RADIUS = 5000
+
     lateinit @Inject var retrofit: Retrofit
+    lateinit @Inject var activitiesTracker: ActivitiesTracker
 
     override fun onCreate() {
         super.onCreate()
-        locationManager = BackPackRApp.appComponent.locationManager()
-        retrofit =  BackPackRApp.appComponent.retrofit()
+        BackPackRApp.appComponent.inject(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         return Service.START_STICKY
     }
 
     override fun onHandleIntent(data: Intent?) {
-        detectedSignsList = data?.getStringArrayListExtra(Constants.EXTRA_CAPTURED_SIGNS)
-        retrieveCurrentLocation()
+        Log.d(TAG, "Starting places recognition service")
+        val detectedSignsList = data?.getStringArrayListExtra(Constants.EXTRA_CAPTURED_SIGNS) ?: emptyList<String>()
+        val currentCoordinates = data?.getStringExtra(Constants.EXTRA_COORDINATES_STRING) ?: "0.0, 0.0"
+        fetchPlacesInfo(detectedSignsList, currentCoordinates)
     }
 
-    private fun retrieveCurrentLocation() {
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, object : LocationListener {
-            override fun onLocationChanged(location: Location?) {
-                val lat = location?.latitude
-                val long = location?.longitude
-                val coordsString = getCoordsString(lat?: 0.0, long?: 0.0)
-                Log.d(TAG, "Location retrieved: $coordsString")
-                notifyLocationRetrieved()
-                sendProgressBroadcast(getString(R.string.loading_screen_fetched_location, coordsString))
-                fetchPlacesInfo(coordsString)
-            }
-
-            override fun onProviderDisabled(p0: String?) {}
-
-            override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {}
-
-            override fun onProviderEnabled(p0: String?) {}
-        })
-    }
-
-    private fun notifyLocationRetrieved() {
-        val intent = Intent(Actions.ACTION_PLACES_FETCHING_PROGRESS)
-        LocalBroadcastManager.getInstance(this@PlacesRecognitionService).sendBroadcast(intent)
-    }
-
-    private fun getCoordsString(lat: Double, long: Double): String {
-        return "$lat,$long"
-    }
-
-    private fun fetchPlacesInfo(coordsString: String) {
+    private fun fetchPlacesInfo(capturedSigns: List<String>, coordsString: String) {
         val placesService: PlacesRetrievalService = retrofit.create(PlacesRetrievalService::class.java)
         placesService.getAllPlacesByCriteria(
-                coordsString, PLACES_NEARBY_RADIUS, detectedSignsList?: ArrayList<String>(), getString(R.string.google_places_api_key))
+                coordsString, PLACES_NEARBY_RADIUS, capturedSigns, getString(R.string.google_places_api_key))
                 .flatMap { placesResults -> Observable.from(placesResults.results) }
                 .filter { place -> place.name != null }
                 .toList()
+                .doOnNext { Log.d(TAG, "Retrieved place: " + it) }
                 .subscribe({ places -> createPlaceItems(places) },
                         { throwable -> Log.e(TAG, "Could not retrieve places: " + throwable.message) }
                 )
     }
 
     private fun createPlaceItems(rawPlaces: List<PlaceDTO>) {
+        Log.d(TAG, "Creating place items: " + rawPlaces.size)
         val placeItems = ArrayList<Place>()
         for (place in rawPlaces) {
             val newPlace = Place()
@@ -99,15 +79,36 @@ class PlacesRecognitionService : IntentService(PlacesRecognitionService::class.j
             newPlace.placeDetailsReference = place.placeId
             placeItems.add(newPlace)
         }
-        sendPlacesBroadcast(placeItems)
-        sendProgressBroadcast(getString(R.string.loading_screen_fetched_place_info))
+        if (activitiesTracker.isApplicationInBackground()) {
+            sendPlacesInfoRetrievalNotification(placeItems)
+        } else {
+            sendPlacesBroadcast(placeItems)
+        }
         stopSelf()
     }
 
-    private fun sendProgressBroadcast(messageString: String) {
-        val progressBroadcast = Intent(Actions.ACTION_PLACES_FETCHING_PROGRESS)
-        progressBroadcast.putExtra(Constants.Keys.EXTRA_PROGRESS_STATUS, messageString)
-        sendBroadcast(progressBroadcast)
+    private fun sendPlacesInfoRetrievalNotification(places: ArrayList<Place>) {
+        val notificationBuilder = NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_notification_new_place)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getNotificationDescription(places.size))
+        val placeDetailsIntent = Intent(this, PlacesDetailsActivity::class.java)
+        val stackBuilder = TaskStackBuilder.create(this)
+        stackBuilder.addParentStack(PlacesDetailsActivity::class.java)
+        stackBuilder.addNextIntent(placeDetailsIntent)
+        val pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        notificationBuilder.setContentIntent(pendingIntent)
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(places[0].hashCode(), notificationBuilder.build())
+    }
+
+    private fun getNotificationDescription(placesCount: Int): String {
+        if (placesCount == 0) {
+            return getString(R.string.notification_title_could_not_find_places)
+        } else {
+            val placesString = if (placesCount == 1) getString(R.string.place) else getString(R.string.places)
+            return getString(R.string.notification_title_retrieved_place_info, placesCount, placesString)
+        }
     }
 
     private fun sendPlacesBroadcast(foundPlaces: ArrayList<Place>) {

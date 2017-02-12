@@ -1,19 +1,15 @@
 package com.app.backpackr.presenters.textcapture
 
 import android.content.Context
-import android.content.Intent
+import android.util.Log
 import android.util.SparseArray
-import com.app.backpackr.helpers.Constants
 import com.app.backpackr.presenters.abs.Presenter
-import com.app.backpackr.textprocessor.services.PlacesRecognitionService
 import com.google.android.gms.vision.text.TextBlock
 import java.util.*
 
-/**
- * Created by kmikhailovskiy on 23.11.2016.
- */
-
 class TextCapturePresenter(val context: Context) : Presenter<ITextCaptureView> {
+    private val TAG = TextCapturePresenter::class.java.simpleName
+
     private var view: ITextCaptureView? = null
     private var textDetectionsList: ArrayList<String>? = null
 
@@ -27,18 +23,17 @@ class TextCapturePresenter(val context: Context) : Presenter<ITextCaptureView> {
 
     fun addDetections(detections: SparseArray<TextBlock>) {
         textDetectionsList = convertDetectionsArrayToList(detections)
+        Log.d(TAG, "Adding detections: " + textDetectionsList);
     }
 
     fun onProcessCurrentImagePressed() {
-        val signsProcessingIntent = Intent(context, PlacesRecognitionService::class.java)
-        signsProcessingIntent.putStringArrayListExtra(Constants.EXTRA_CAPTURED_SIGNS, textDetectionsList)
-        context.startService(signsProcessingIntent)
-        view?.onPlacesLoadingStarted()
+        Log.d(TAG, "onProcessCurrentImagePressed");
+        view?.onCapturedDataInitialized(textDetectionsList)
     }
 
     fun convertDetectionsArrayToList(textDetections: SparseArray<TextBlock>): ArrayList<String> {
         val detectionsList = (0 until textDetections.size())
-                        .mapTo(ArrayList<String>()) { textDetections[it].value }
+                        .mapTo(ArrayList<String>()) { if (textDetections[it] != null) textDetections[it].value else "" }
         return detectionsList
     }
 
