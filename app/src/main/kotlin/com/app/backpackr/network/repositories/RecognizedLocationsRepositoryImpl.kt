@@ -1,9 +1,9 @@
-package com.app.backpackr.api.repositories
+package com.app.backpackr.network.repositories
 
 import android.content.Context
 import com.app.backpackr.BackPackRApp
-import com.app.backpackr.api.models.Place
-import com.app.backpackr.api.models.dto.LocationDTO
+import com.app.backpackr.network.models.Place
+import com.app.backpackr.network.models.dto.LocationDTO
 import com.app.backpackr.dagger.components.AppComponent
 import io.realm.Realm
 import io.realm.RealmResults

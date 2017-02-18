@@ -1,7 +1,7 @@
-package com.app.backpackr.api.repositories
+package com.app.backpackr.network.repositories
 
-import com.app.backpackr.api.models.Place
-import com.app.backpackr.api.models.dto.LocationDTO
+import com.app.backpackr.network.models.Place
+import com.app.backpackr.network.models.dto.LocationDTO
 import io.realm.RealmResults
 import rx.Observable
 

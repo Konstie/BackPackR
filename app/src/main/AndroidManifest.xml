@@ -37,7 +37,13 @@
         </activity>
         <activity
             android:name=".ui.sections.loading.LoadingActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenLayout|locale"/>
+
+        <activity
+            android:name=".ui.sections.details.PlacesFoundActivity"
+            android:theme="@style/AppTheme"/>
+
         <activity
             android:name=".ui.sections.details.PlacesDetailsActivity"
             android:theme="@style/AppTheme.NoActionBar" />

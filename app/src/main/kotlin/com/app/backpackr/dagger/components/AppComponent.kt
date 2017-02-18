@@ -1,7 +1,7 @@
 package com.app.backpackr.dagger.components
 
 import com.app.backpackr.BackPackRApp
-import com.app.backpackr.api.repositories.RecognizedLocationsRepositoryImpl
+import com.app.backpackr.network.repositories.RecognizedLocationsRepositoryImpl
 import com.app.backpackr.dagger.modules.AppModule
 import com.app.backpackr.dagger.modules.NetworkModule
 import com.app.backpackr.presenters.loading.LoadingPresenter

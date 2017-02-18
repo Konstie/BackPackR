@@ -14,7 +14,7 @@ import android.widget.TextView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.app.backpackr.R
-import com.app.backpackr.api.models.Place
+import com.app.backpackr.network.models.Place
 import com.app.backpackr.helpers.Actions
 import com.app.backpackr.helpers.Constants
 import com.app.backpackr.helpers.IntentHelper
@@ -66,7 +66,8 @@ class LoadingActivity : BaseActivity<LoadingPresenter, ILoadingView>(), ILoading
     }
 
     private fun onPlacesLoaded(retrievedPlaces: ArrayList<Place>) {
-        Log.d(TAG, "onPlacesLoaded: " + retrievedPlaces)
+        startActivity(IntentHelper.createPlacesFoundIntent(this@LoadingActivity))
+        finish()
     }
 
     override fun onStart() {
@@ -78,12 +79,12 @@ class LoadingActivity : BaseActivity<LoadingPresenter, ILoadingView>(), ILoading
         val intentFilter = IntentFilter()
         intentFilter.addAction(Actions.ACTION_PLACES_FETCHED)
         intentFilter.addAction(Actions.ACTION_PLACES_FETCHING_PROGRESS)
-        LocalBroadcastManager.getInstance(this).registerReceiver(placesReceiver, intentFilter)
+        registerReceiver(placesReceiver, intentFilter)
     }
 
     override fun onStop() {
         super.onStop()
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(placesReceiver)
+        unregisterReceiver(placesReceiver)
     }
 
     private fun getRandomBackgroundPicture(): Int {
@@ -99,6 +100,7 @@ class LoadingActivity : BaseActivity<LoadingPresenter, ILoadingView>(), ILoading
     inner class PlacesReceiver : BroadcastReceiver() {
         @Suppress("UNCHECKED_CAST")
         override fun onReceive(p0: Context?, data: Intent?) {
+            Log.d(TAG, "onReceive from broadcast receiver")
             if (data?.action == Actions.ACTION_PLACES_FETCHING_PROGRESS) {
                 loadingProgressTextView.text = data?.getStringExtra(Constants.EXTRA_PROGRESS_STATUS)
             } else if (data?.action == Actions.ACTION_PLACES_FETCHED) {
@@ -113,10 +115,13 @@ class LoadingActivity : BaseActivity<LoadingPresenter, ILoadingView>(), ILoading
     }
 
     override fun onPresenterPrepared(presenter: LoadingPresenter) {
+        if (loadingPresenter != null) {
+            return
+        }
         this.loadingPresenter = presenter
         this.loadingPresenter?.onViewAttached(this@LoadingActivity)
         if (RuntimePermissionsHelper.checkFineLocationPermission(this@LoadingActivity)) {
-            this.loadingPresenter?.defineCurrentLocation(this@LoadingActivity)
+            this.loadingPresenter?.defineCurrentLocation()
         } else {
             requestAppPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), R.string.permission_warning, Constants.PermissionCodes.FINE_LOCATION_REQUEST_CODE)
         }
@@ -124,7 +129,7 @@ class LoadingActivity : BaseActivity<LoadingPresenter, ILoadingView>(), ILoading
 
     override fun onPermissionsGranted(requestCode: Int) {
         if (requestCode == Constants.PermissionCodes.FINE_LOCATION_REQUEST_CODE) {
-            loadingPresenter?.defineCurrentLocation(this@LoadingActivity)
+            loadingPresenter?.defineCurrentLocation()
         }
     }
 

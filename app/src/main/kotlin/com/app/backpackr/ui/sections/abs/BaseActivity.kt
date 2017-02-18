@@ -1,17 +1,13 @@
 package com.app.backpackr.ui.sections.abs
 
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.LoaderManager
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.Loader
 import android.util.SparseIntArray
-import android.view.View
 import com.app.backpackr.R
 import com.app.backpackr.helpers.IntentHelper
 
@@ -107,8 +103,12 @@ abstract class BaseActivity<P : Presenter<V>, V> : FullScreenActivity(), LoaderM
         return LOADER_ID
     }
 
+    override fun onDestroy() {
+        presenter?.onViewDetached()
+        super.onDestroy()
+    }
+
     companion object {
-        private val TAG = BaseActivity::class.java.name
         private val LOADER_ID = 101
     }
 }

@@ -11,7 +11,7 @@ import android.widget.TextView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.app.backpackr.R
-import com.app.backpackr.api.models.Place
+import com.app.backpackr.network.models.Place
 import com.app.backpackr.dagger.modules.AppModule
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter

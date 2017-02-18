@@ -1,6 +1,5 @@
 package com.app.backpackr.presenters.loading
 
-import android.content.Context
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -17,6 +16,7 @@ class LoadingPresenter : Presenter<ILoadingView> {
     private val LOCATION_REFRESH_DISTANCE = 10f
 
     private var loadingView: ILoadingView? = null
+    private var locationsRequested = false
 
     @Inject lateinit var locationManager: LocationManager
 
@@ -28,7 +28,10 @@ class LoadingPresenter : Presenter<ILoadingView> {
         loadingView = view
     }
 
-    fun defineCurrentLocation(context: Context) {
+    fun defineCurrentLocation() {
+        if (locationsRequested) {
+            return
+        }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, object : LocationListener {
             override fun onLocationChanged(location: Location?) {
@@ -37,6 +40,7 @@ class LoadingPresenter : Presenter<ILoadingView> {
                 val coordsString = getCoordsString(lat?: 0.0, long?: 0.0)
                 Log.d(TAG, "Location retrieved: $coordsString")
                 loadingView?.onCurrentLocationFetched(coordsString)
+                locationsRequested
             }
 
             override fun onProviderDisabled(p0: String?) {}

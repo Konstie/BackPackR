@@ -4,7 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import com.app.backpackr.network.models.Place
 import com.app.backpackr.textprocessor.services.PlacesRecognitionService
+import com.app.backpackr.ui.sections.details.PlacesDetailsActivity
+import com.app.backpackr.ui.sections.details.PlacesFoundActivity
 import com.app.backpackr.ui.sections.loading.LoadingActivity
 import com.app.backpackr.ui.sections.textcapture.TextCaptureActivity
 import java.util.*
@@ -33,6 +36,17 @@ class IntentHelper {
             val loadingIntent = Intent(context, LoadingActivity::class.java)
             loadingIntent.putStringArrayListExtra(Constants.EXTRA_CAPTURED_SIGNS, spots)
             return loadingIntent
+        }
+
+        fun createPlacesFoundIntent(context: Context): Intent {
+            val placesFoundIntent = Intent(context, PlacesFoundActivity::class.java)
+            return placesFoundIntent
+        }
+
+        fun createPlacesDetailsIntent(context: Context, retrievedPlaces: ArrayList<Place>): Intent {
+            val detailsIntent = Intent(context, PlacesDetailsActivity::class.java)
+            detailsIntent.putExtra(Constants.EXTRA_FETCHED_LOCATIONS, retrievedPlaces)
+            return detailsIntent
         }
     }
 }

@@ -1,8 +1,9 @@
 package com.app.backpackr.dagger.modules
 
-import com.app.backpackr.api.ApiBaseUrls
-import com.app.backpackr.api.ApiHeaders
-import com.app.backpackr.api.models.BaseUrl
+import com.app.backpackr.network.ApiBaseUrls
+import com.app.backpackr.network.ApiHeaders
+import com.app.backpackr.network.LoggingInterceptor
+import com.app.backpackr.network.models.BaseUrl
 import com.squareup.moshi.Moshi
 
 import javax.inject.Singleton
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit
  */
 
 @Module
-class NetworkModule() {
+class NetworkModule {
     val CONNECT_TIMEOUT: Long = 30
 
     @Provides
@@ -41,14 +42,7 @@ class NetworkModule() {
         val builder: OkHttpClient.Builder = OkHttpClient.Builder()
                 .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
-                .addInterceptor {
-                    val originalRequest = it.request()
-                    val requestBuilder = originalRequest.newBuilder()
-                            .addHeader(ApiHeaders.KEY_ACCEPT, ApiHeaders.VAL_CONTENT_TYPE)
-                            .addHeader(ApiHeaders.KEY_CONTENT_TYPE, ApiHeaders.VAL_CONTENT_TYPE)
-                    val request = requestBuilder.build()
-                    it.proceed(request)
-                }
+                .addInterceptor(LoggingInterceptor())
 
         return builder.build()
     }

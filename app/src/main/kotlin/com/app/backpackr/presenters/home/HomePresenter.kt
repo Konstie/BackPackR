@@ -2,7 +2,7 @@ package com.app.backpackr.presenters.home
 
 import android.content.Context
 import android.util.Log
-import com.app.backpackr.api.repositories.RecognizedLocationsRepositoryImpl
+import com.app.backpackr.network.repositories.RecognizedLocationsRepositoryImpl
 import com.app.backpackr.presenters.abs.Presenter
 
 /**

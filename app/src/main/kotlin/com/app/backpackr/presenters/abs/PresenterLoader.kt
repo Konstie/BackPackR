@@ -1,9 +1,5 @@
 package com.app.backpackr.presenters.abs
 
-/**
- * Created by kmikhailovskiy on 23.11.2016.
- */
-
 import android.content.Context
 import android.support.v4.content.Loader
 import android.util.Log
@@ -28,15 +24,12 @@ class PresenterLoader<T : Presenter<*>>(context: Context, private val factory: P
 
     override fun deliverResult(data: T) {
         super.deliverResult(data)
-        Log.i("loader", "deliverResult-" + tag)
     }
 
     override fun onStopLoading() {
-        Log.i("loader", "onStopLoading-" + tag)
     }
 
     override fun onReset() {
-        Log.i("loader", "onReset-" + tag)
         if (presenter != null) {
             presenter?.onDestroyed()
             presenter = null

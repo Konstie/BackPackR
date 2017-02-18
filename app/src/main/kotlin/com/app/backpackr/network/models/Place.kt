@@ -1,16 +1,17 @@
-package com.app.backpackr.api.models
+package com.app.backpackr.network.models
 
 import android.net.Uri
-import com.app.backpackr.api.ApiBaseUrls
+import com.app.backpackr.network.ApiBaseUrls
 import com.app.backpackr.helpers.ApiParams
 import com.app.backpackr.helpers.Constants
 import io.realm.RealmObject
+import java.io.Serializable
 
 /**
  * Created by konstie on 17.11.16.
  */
 
-open class Place : RealmObject() {
+open class Place : RealmObject(), Serializable {
     open var title : String? = null
     open var city : String? = null
     open var country : String? = null

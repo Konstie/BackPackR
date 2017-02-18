@@ -7,7 +7,7 @@ import android.support.v7.widget.Toolbar
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.app.backpackr.R
-import com.app.backpackr.api.models.Place
+import com.app.backpackr.network.models.Place
 import com.app.backpackr.helpers.IntentHelper
 import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.home.HomePresenter
@@ -65,11 +65,6 @@ class HomeActivity : BaseActivity<HomePresenter, HomeView>(), HomeView {
     }
 
     override fun onPermissionsGranted(requestCode: Int) {}
-
-    override fun onDestroy() {
-        super.onDestroy()
-        homePresenter?.onViewDetached()
-    }
 
     override fun tag(): String {
         return HomeActivity::class.java.name

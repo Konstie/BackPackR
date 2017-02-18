@@ -202,11 +202,9 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         textDetectorProcessor?.textDetectionListener = null
         cameraPreview.release()
-        presenter?.onViewDetached()
-        presenter?.onDestroyed()
+        super.onDestroy()
     }
 
     override fun tag(): String {

@@ -1,4 +1,4 @@
-package com.app.backpackr.api.models
+package com.app.backpackr.network.models
 
 /**
  * Created by konstie on 25.12.16.

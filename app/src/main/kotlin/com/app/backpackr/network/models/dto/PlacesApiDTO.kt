@@ -1,4 +1,4 @@
-package com.app.backpackr.api.models.dto
+package com.app.backpackr.network.models.dto
 
 import com.squareup.moshi.Json
 

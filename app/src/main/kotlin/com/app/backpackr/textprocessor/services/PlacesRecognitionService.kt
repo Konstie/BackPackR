@@ -17,13 +17,14 @@ import android.support.v7.app.NotificationCompat
 import android.util.Log
 import com.app.backpackr.BackPackRApp
 import com.app.backpackr.R
-import com.app.backpackr.api.models.Place
-import com.app.backpackr.api.models.dto.PlaceDTO
-import com.app.backpackr.api.services.PlacesRetrievalService
+import com.app.backpackr.network.models.Place
+import com.app.backpackr.network.models.dto.PlaceDTO
+import com.app.backpackr.network.services.PlacesRetrievalService
 import com.app.backpackr.helpers.Actions
 import com.app.backpackr.helpers.ActivitiesTracker
 import com.app.backpackr.helpers.Constants
 import com.app.backpackr.ui.sections.details.PlacesDetailsActivity
+import com.app.backpackr.ui.sections.details.PlacesFoundActivity
 import retrofit2.Retrofit
 import rx.Observable
 import java.util.*
@@ -48,7 +49,6 @@ class PlacesRecognitionService : IntentService(PlacesRecognitionService::class.j
     }
 
     override fun onHandleIntent(data: Intent?) {
-        Log.d(TAG, "Starting places recognition service")
         val detectedSignsList = data?.getStringArrayListExtra(Constants.EXTRA_CAPTURED_SIGNS) ?: emptyList<String>()
         val currentCoordinates = data?.getStringExtra(Constants.EXTRA_COORDINATES_STRING) ?: "0.0, 0.0"
         fetchPlacesInfo(detectedSignsList, currentCoordinates)
@@ -61,14 +61,13 @@ class PlacesRecognitionService : IntentService(PlacesRecognitionService::class.j
                 .flatMap { placesResults -> Observable.from(placesResults.results) }
                 .filter { place -> place.name != null }
                 .toList()
-                .doOnNext { Log.d(TAG, "Retrieved place: " + it) }
                 .subscribe({ places -> createPlaceItems(places) },
                         { throwable -> Log.e(TAG, "Could not retrieve places: " + throwable.message) }
                 )
     }
 
     private fun createPlaceItems(rawPlaces: List<PlaceDTO>) {
-        Log.d(TAG, "Creating place items: " + rawPlaces.size)
+        Log.d(TAG, "Retrieved places: " + rawPlaces)
         val placeItems = ArrayList<Place>()
         for (place in rawPlaces) {
             val newPlace = Place()
@@ -92,9 +91,9 @@ class PlacesRecognitionService : IntentService(PlacesRecognitionService::class.j
                 .setSmallIcon(R.drawable.ic_notification_new_place)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getNotificationDescription(places.size))
-        val placeDetailsIntent = Intent(this, PlacesDetailsActivity::class.java)
+        val placeDetailsIntent = Intent(this, PlacesFoundActivity::class.java)
         val stackBuilder = TaskStackBuilder.create(this)
-        stackBuilder.addParentStack(PlacesDetailsActivity::class.java)
+        stackBuilder.addParentStack(PlacesFoundActivity::class.java)
         stackBuilder.addNextIntent(placeDetailsIntent)
         val pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
         notificationBuilder.setContentIntent(pendingIntent)

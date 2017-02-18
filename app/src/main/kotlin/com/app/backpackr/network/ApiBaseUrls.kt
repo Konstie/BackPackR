@@ -1,4 +1,4 @@
-package com.app.backpackr.api
+package com.app.backpackr.network
 
 /**
  * Created by konstie on 25.12.16.

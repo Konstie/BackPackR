@@ -1,6 +1,6 @@
-package com.app.backpackr.api.services
+package com.app.backpackr.network.services
 
-import com.app.backpackr.api.models.dto.BasePlaceDTO
+import com.app.backpackr.network.models.dto.BasePlaceDTO
 import retrofit2.http.GET
 import retrofit2.http.Query
 import rx.Observable
