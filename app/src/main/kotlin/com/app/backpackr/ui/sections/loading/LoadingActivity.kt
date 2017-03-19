@@ -6,19 +6,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.support.annotation.DrawableRes
-import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.app.backpackr.R
-import com.app.backpackr.network.models.Place
-import com.app.backpackr.helpers.Actions
-import com.app.backpackr.helpers.Constants
-import com.app.backpackr.helpers.IntentHelper
-import com.app.backpackr.helpers.RuntimePermissionsHelper
+import com.app.backpackr.data.local.models.Place
+import com.app.backpackr.utils.Constants
+import com.app.backpackr.utils.IntentHelper
+import com.app.backpackr.utils.RuntimePermissionsHelper
 import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.loading.ILoadingView
 import com.app.backpackr.presenters.loading.LoadingPresenter
@@ -33,7 +30,7 @@ class LoadingActivity : BaseActivity<LoadingPresenter, ILoadingView>(), ILoading
 
     val backgroundPictures: Array<Int> = arrayOf(R.drawable.loading_bg_1, R.drawable.loading_bg_2, R.drawable.loading_bg_3, R.drawable.loading_bg_4, R.drawable.loading_bg_5)
 
-    @DrawableRes var currentBackgroundPicture: Int? = null
+    var currentBackgroundPicture: Int? = null
     var capturedSigns: ArrayList<String>? = null
 
     @BindView(R.id.loading_secondary_label_view) lateinit var loadingProgressTextView: TextView
@@ -44,8 +41,8 @@ class LoadingActivity : BaseActivity<LoadingPresenter, ILoadingView>(), ILoading
         setupFullScreen()
         setContentView(R.layout.activity_loading)
         ButterKnife.bind(this)
-        currentBackgroundPicture = savedInstanceState?.getInt(Constants.EXTRA_STORED_BACKGROUND_PICTURE)
-        capturedSigns = intent.getStringArrayListExtra(Constants.EXTRA_CAPTURED_SIGNS)
+        currentBackgroundPicture = savedInstanceState?.getInt(Constants.Keys.EXTRA_STORED_BACKGROUND_PICTURE)
+        capturedSigns = intent.getStringArrayListExtra(Constants.Keys.EXTRA_CAPTURED_SIGNS)
         setupBackgroundImage()
         placesReceiver = PlacesReceiver()
     }
@@ -77,8 +74,8 @@ class LoadingActivity : BaseActivity<LoadingPresenter, ILoadingView>(), ILoading
 
     private fun registerPlacesReceiver() {
         val intentFilter = IntentFilter()
-        intentFilter.addAction(Actions.ACTION_PLACES_FETCHED)
-        intentFilter.addAction(Actions.ACTION_PLACES_FETCHING_PROGRESS)
+        intentFilter.addAction(Constants.Actions.ACTION_PLACES_FETCHED)
+        intentFilter.addAction(Constants.Actions.ACTION_PLACES_FETCHING_PROGRESS)
         registerReceiver(placesReceiver, intentFilter)
     }
 
@@ -94,24 +91,20 @@ class LoadingActivity : BaseActivity<LoadingPresenter, ILoadingView>(), ILoading
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        outState?.putInt(Constants.EXTRA_STORED_BACKGROUND_PICTURE, currentBackgroundPicture!!)
+        outState?.putInt(Constants.Keys.EXTRA_STORED_BACKGROUND_PICTURE, currentBackgroundPicture!!)
     }
 
     inner class PlacesReceiver : BroadcastReceiver() {
         @Suppress("UNCHECKED_CAST")
         override fun onReceive(p0: Context?, data: Intent?) {
             Log.d(TAG, "onReceive from broadcast receiver")
-            if (data?.action == Actions.ACTION_PLACES_FETCHING_PROGRESS) {
-                loadingProgressTextView.text = data?.getStringExtra(Constants.EXTRA_PROGRESS_STATUS)
-            } else if (data?.action == Actions.ACTION_PLACES_FETCHED) {
-                val retrievedPlaces = data?.getSerializableExtra(Constants.EXTRA_FETCHED_LOCATIONS)
+            if (data?.action == Constants.Actions.ACTION_PLACES_FETCHING_PROGRESS) {
+                loadingProgressTextView.text = data.getStringExtra(Constants.Keys.EXTRA_PROGRESS_STATUS)
+            } else if (data?.action == Constants.Actions.ACTION_PLACES_FETCHED) {
+                val retrievedPlaces = data.getSerializableExtra(Constants.Keys.EXTRA_FETCHED_LOCATIONS)
                 onPlacesLoaded(retrievedPlaces as ArrayList<Place>)
             }
         }
-    }
-
-    override fun tag(): String {
-        return LoadingActivity::class.java.simpleName
     }
 
     override fun onPresenterPrepared(presenter: LoadingPresenter) {

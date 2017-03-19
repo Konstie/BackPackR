@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.app.backpackr.BackPackRApp
-import com.app.backpackr.helpers.ActivitiesTracker
+import com.app.backpackr.utils.ActivitiesTracker
 import javax.inject.Inject
 
 open class FullScreenActivity : AppCompatActivity() {

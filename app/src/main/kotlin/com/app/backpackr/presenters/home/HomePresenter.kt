@@ -2,8 +2,11 @@ package com.app.backpackr.presenters.home
 
 import android.content.Context
 import android.util.Log
-import com.app.backpackr.network.repositories.RecognizedLocationsRepositoryImpl
+import com.app.backpackr.BackPackRApp
+import com.app.backpackr.data.local.repository.RecognizedLocationsRepositoryImpl
 import com.app.backpackr.presenters.abs.Presenter
+import io.realm.Realm
+import javax.inject.Inject
 
 /**
  * Created by konstie on 17.11.16.
@@ -13,10 +16,13 @@ class HomePresenter(var context : Context) : Presenter<HomeView> {
     val TAG = HomePresenter::class.java.name
 
     var view: HomeView? = null
-    var locationsRepository: RecognizedLocationsRepositoryImpl
+    val locationsRepository: RecognizedLocationsRepositoryImpl
+
+    @Inject lateinit var realm: Realm
 
     init {
-        locationsRepository = RecognizedLocationsRepositoryImpl(context)
+        BackPackRApp.databaseComponent.inject(this)
+        locationsRepository = RecognizedLocationsRepositoryImpl(realm)
     }
 
     fun fetchSavedLocations() {

@@ -7,8 +7,8 @@ import android.support.v7.widget.Toolbar
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.app.backpackr.R
-import com.app.backpackr.network.models.Place
-import com.app.backpackr.helpers.IntentHelper
+import com.app.backpackr.data.local.models.Place
+import com.app.backpackr.utils.IntentHelper
 import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.home.HomePresenter
 import com.app.backpackr.presenters.home.HomeView
@@ -19,7 +19,6 @@ import retrofit2.Retrofit
 import javax.inject.Inject
 
 class HomeActivity : BaseActivity<HomePresenter, HomeView>(), HomeView {
-    private var twoPane = false
     private var homePresenter: HomePresenter? = null
 
     @Inject lateinit var okHttpClient: OkHttpClient
@@ -65,10 +64,6 @@ class HomeActivity : BaseActivity<HomePresenter, HomeView>(), HomeView {
     }
 
     override fun onPermissionsGranted(requestCode: Int) {}
-
-    override fun tag(): String {
-        return HomeActivity::class.java.name
-    }
 
     override val presenterFactory: PresenterFactory<HomePresenter>
         get() = object : PresenterFactory<HomePresenter> {

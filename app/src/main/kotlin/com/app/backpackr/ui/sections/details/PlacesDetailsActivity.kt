@@ -22,10 +22,6 @@ class PlacesDetailsActivity : BaseActivity<DetailsPresenter, IDetailsView>(), ID
         detailsPresenter?.onViewAttached(this@PlacesDetailsActivity)
     }
 
-    override fun tag(): String {
-        return PlacesDetailsActivity::class.java.simpleName
-    }
-
     override val presenterFactory: PresenterFactory<DetailsPresenter>
         get() = object : PresenterFactory<DetailsPresenter> {
             override fun create(): DetailsPresenter {

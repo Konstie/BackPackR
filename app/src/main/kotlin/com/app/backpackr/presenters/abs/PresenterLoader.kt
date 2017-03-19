@@ -4,7 +4,7 @@ import android.content.Context
 import android.support.v4.content.Loader
 import android.util.Log
 
-class PresenterLoader<T : Presenter<*>>(context: Context, private val factory: PresenterFactory<T>, private val tag: String) : Loader<T>(context) {
+class PresenterLoader<T : Presenter<*>>(context: Context, private val factory: PresenterFactory<T>) : Loader<T>(context) {
     private var presenter: T? = null
 
     override fun onStartLoading() {

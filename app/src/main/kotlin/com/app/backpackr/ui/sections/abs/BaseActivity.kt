@@ -9,7 +9,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.content.Loader
 import android.util.SparseIntArray
 import com.app.backpackr.R
-import com.app.backpackr.helpers.IntentHelper
+import com.app.backpackr.utils.IntentHelper
 
 import com.app.backpackr.presenters.abs.Presenter
 import com.app.backpackr.presenters.abs.PresenterFactory
@@ -46,7 +46,7 @@ abstract class BaseActivity<P : Presenter<V>, V> : FullScreenActivity(), LoaderM
     }
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<P> {
-        return PresenterLoader(this@BaseActivity, presenterFactory, tag())
+        return PresenterLoader(this@BaseActivity, presenterFactory)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -86,8 +86,6 @@ abstract class BaseActivity<P : Presenter<V>, V> : FullScreenActivity(), LoaderM
     }
 
     protected abstract fun onPermissionsGranted(requestCode: Int)
-
-    protected abstract fun tag(): String
 
     protected abstract val presenterFactory: PresenterFactory<P>
 

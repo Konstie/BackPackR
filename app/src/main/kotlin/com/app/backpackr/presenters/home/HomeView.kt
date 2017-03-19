@@ -1,6 +1,6 @@
 package com.app.backpackr.presenters.home
 
-import com.app.backpackr.network.models.Place
+import com.app.backpackr.data.local.models.Place
 import io.realm.RealmResults
 
 /**

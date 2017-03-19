@@ -1,9 +1,11 @@
 package com.app.backpackr
 
 import android.app.Application
-import com.app.backpackr.dagger.components.AppComponent
-import com.app.backpackr.dagger.components.DaggerAppComponent
-import com.app.backpackr.dagger.modules.AppModule
+import com.app.backpackr.injection.components.AppComponent
+import com.app.backpackr.injection.components.DaggerAppComponent
+import com.app.backpackr.injection.components.DaggerDatabaseComponent
+import com.app.backpackr.injection.components.DatabaseComponent
+import com.app.backpackr.injection.modules.AppModule
 import io.realm.Realm
 
 /**
@@ -13,6 +15,7 @@ import io.realm.Realm
 class BackPackRApp : Application() {
     companion object {
         lateinit var appComponent: AppComponent
+        lateinit var databaseComponent: DatabaseComponent
     }
 
     override fun onCreate() {
@@ -20,6 +23,8 @@ class BackPackRApp : Application() {
         Realm.init(this)
         appComponent = DaggerAppComponent.builder()
                 .appModule(AppModule(this))
+                .build()
+        databaseComponent = DaggerDatabaseComponent.builder()
                 .build()
     }
 }

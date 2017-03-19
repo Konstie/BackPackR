@@ -26,7 +26,7 @@ class CameraSourcePreview(context: Context, attributeSet: AttributeSet) : ViewGr
         addView(surfaceView)
     }
 
-    @RequiresPermission(Manifest.permission.CAMERA)
+    @RequiresPermission(value = Manifest.permission.CAMERA)
     @Throws(IOException::class, SecurityException::class)
     fun start(cameraSource: CustomCameraSource?) {
         if (cameraSource == null) {
@@ -41,7 +41,7 @@ class CameraSourcePreview(context: Context, attributeSet: AttributeSet) : ViewGr
         }
     }
 
-    @RequiresPermission(Manifest.permission.CAMERA)
+    @RequiresPermission(value = Manifest.permission.CAMERA)
     @Throws(IOException::class, SecurityException::class)
     fun start(cameraSource: CustomCameraSource, overlay: GraphicOverlay<OcrGraphic>) {
         graphicOverlay = overlay
@@ -78,7 +78,7 @@ class CameraSourcePreview(context: Context, attributeSet: AttributeSet) : ViewGr
         }
     }
 
-    @RequiresPermission(Manifest.permission.CAMERA)
+    @RequiresPermission(value = Manifest.permission.CAMERA)
     @Throws(IOException::class, SecurityException::class)
     private fun startIfReady() {
         if (startRequested && surfaceAvailable) {

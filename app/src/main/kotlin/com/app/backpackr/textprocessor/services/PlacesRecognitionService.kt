@@ -6,27 +6,20 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
-import android.os.Bundle
-import android.support.v4.app.NotificationManagerCompat
 import android.support.v4.app.TaskStackBuilder
-import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.NotificationCompat
 import android.util.Log
 import com.app.backpackr.BackPackRApp
 import com.app.backpackr.R
-import com.app.backpackr.network.models.Place
-import com.app.backpackr.network.models.dto.PlaceDTO
-import com.app.backpackr.network.services.PlacesRetrievalService
-import com.app.backpackr.helpers.Actions
-import com.app.backpackr.helpers.ActivitiesTracker
-import com.app.backpackr.helpers.Constants
-import com.app.backpackr.ui.sections.details.PlacesDetailsActivity
+import com.app.backpackr.data.local.models.Place
+import com.app.backpackr.data.network.models.PlaceDTO
+import com.app.backpackr.data.network.services.PlacesRetrievalService
+import com.app.backpackr.utils.ActivitiesTracker
+import com.app.backpackr.utils.Constants
 import com.app.backpackr.ui.sections.details.PlacesFoundActivity
+
+import io.reactivex.Observable
 import retrofit2.Retrofit
-import rx.Observable
 import java.util.*
 import javax.inject.Inject
 
@@ -49,8 +42,8 @@ class PlacesRecognitionService : IntentService(PlacesRecognitionService::class.j
     }
 
     override fun onHandleIntent(data: Intent?) {
-        val detectedSignsList = data?.getStringArrayListExtra(Constants.EXTRA_CAPTURED_SIGNS) ?: emptyList<String>()
-        val currentCoordinates = data?.getStringExtra(Constants.EXTRA_COORDINATES_STRING) ?: "0.0, 0.0"
+        val detectedSignsList = data?.getStringArrayListExtra(Constants.Keys.EXTRA_CAPTURED_SIGNS) ?: emptyList<String>()
+        val currentCoordinates = data?.getStringExtra(Constants.Keys.EXTRA_COORDINATES_STRING) ?: "0.0, 0.0"
         fetchPlacesInfo(detectedSignsList, currentCoordinates)
     }
 
@@ -58,7 +51,7 @@ class PlacesRecognitionService : IntentService(PlacesRecognitionService::class.j
         val placesService: PlacesRetrievalService = retrofit.create(PlacesRetrievalService::class.java)
         placesService.getAllPlacesByCriteria(
                 coordsString, PLACES_NEARBY_RADIUS, capturedSigns, getString(R.string.google_places_api_key))
-                .flatMap { placesResults -> Observable.from(placesResults.results) }
+                .flatMap { placesResults -> Observable.fromIterable(placesResults.results) }
                 .filter { place -> place.name != null }
                 .toList()
                 .subscribe({ places -> createPlaceItems(places) },
@@ -111,7 +104,7 @@ class PlacesRecognitionService : IntentService(PlacesRecognitionService::class.j
     }
 
     private fun sendPlacesBroadcast(foundPlaces: ArrayList<Place>) {
-        val broadcastIntent = Intent(Actions.ACTION_PLACES_FETCHED)
+        val broadcastIntent = Intent(Constants.Actions.ACTION_PLACES_FETCHED)
         broadcastIntent.putExtra(Constants.Keys.EXTRA_FETCHED_LOCATIONS, foundPlaces)
         sendBroadcast(broadcastIntent)
     }

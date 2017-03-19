@@ -16,9 +16,9 @@ import android.widget.Toast
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.app.backpackr.R
-import com.app.backpackr.helpers.Constants
-import com.app.backpackr.helpers.IntentHelper
-import com.app.backpackr.helpers.RuntimePermissionsHelper
+import com.app.backpackr.utils.Constants
+import com.app.backpackr.utils.IntentHelper
+import com.app.backpackr.utils.RuntimePermissionsHelper
 import com.app.backpackr.presenters.abs.PresenterFactory
 import com.app.backpackr.presenters.textcapture.ITextCaptureView
 import com.app.backpackr.presenters.textcapture.TextCapturePresenter
@@ -90,17 +90,17 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
         textRecognizer?.setProcessor(textDetectorProcessor)
 
         if (textRecognizer?.isOperational == false) {
-            Log.w(tag(), "Camera detector dependencies are not available")
+            Log.w(TAG, "Camera detector dependencies are not available")
 
             val lowStorageFilter = IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW)
             val hasLowStorage = registerReceiver(null, lowStorageFilter) != null
 
             if (hasLowStorage) {
                 Toast.makeText(this, R.string.ocr_screen_not_enough_storage, Toast.LENGTH_LONG).show()
-                Log.w(tag(), "Yout device has low storage")
+                Log.w(TAG, "Yout device has low storage")
             }
         } else {
-            Log.d(tag(), "CameraSource initialization started!")
+            Log.d(TAG, "CameraSource initialization started!")
             cameraSource = CustomCameraSource.Builder(applicationContext, textRecognizer)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
                     .setRequestedPreviewSize(1280, 1024)
@@ -176,12 +176,12 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
 
     override fun onPermissionsGranted(requestCode: Int) {
         if (requestCode != Constants.PermissionCodes.CAMERA_REQUEST_CODE) {
-            Log.d(tag(), "Something has gone wrong with permission result: " + requestCode)
+            Log.d(TAG, "Something has gone wrong with permission result: " + requestCode)
             return
         }
-        Log.d(tag(), "Camera permission was granted!")
-        val autoFocus = intent.getBooleanExtra(Constants.EXTRA_AUTO_FOCUS, false)
-        val useFlash = intent.getBooleanExtra(Constants.EXTRA_USE_FLASH, false)
+        Log.d(TAG, "Camera permission was granted!")
+        val autoFocus = intent.getBooleanExtra(Constants.Keys.EXTRA_AUTO_FOCUS, false)
+        val useFlash = intent.getBooleanExtra(Constants.Keys.EXTRA_USE_FLASH, false)
         createCameraSource(autoFocus, useFlash)
     }
 
@@ -205,10 +205,6 @@ class TextCaptureActivity : BaseActivity<TextCapturePresenter, ITextCaptureView>
         textDetectorProcessor?.textDetectionListener = null
         cameraPreview.release()
         super.onDestroy()
-    }
-
-    override fun tag(): String {
-        return TextCaptureActivity::class.java.name
     }
 
     override val presenterFactory: PresenterFactory<TextCapturePresenter>

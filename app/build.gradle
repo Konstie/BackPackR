@@ -14,10 +14,10 @@ repositories {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.app.backpackr"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -38,11 +38,11 @@ kapt {
     generateStubs = true
 }
 
-def supportVersion = '25.1.0'
-def playServicesVersion = '10.0.1'
-def rxVersion = '1.2.3'
-def rxAndroidVersion = '1.2.1'
-def daggerVersion = '2.7'
+def supportVersion = '25.3.0'
+def playServicesVersion = '10.2.0'
+def rxVersion = '2.0.7'
+def rxAndroidVersion = '2.0.1'
+def daggerVersion = '2.8'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -62,8 +62,8 @@ dependencies {
     compile "com.google.android.gms:play-services-maps:$playServicesVersion"
 
     // rx dependencies
-    compile "io.reactivex:rxjava:$rxVersion"
-    compile "io.reactivex:rxandroid:$rxAndroidVersion"
+    compile "io.reactivex.rxjava2:rxjava:$rxVersion"
+    compile "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
 
     // dependency injection
     compile "com.google.dagger:dagger:$daggerVersion"
@@ -78,7 +78,7 @@ dependencies {
         exclude module: 'okhttp'
     }
     compile 'com.squareup.retrofit2:converter-moshi:2.1.0'
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'
     compile 'com.squareup.okhttp3:okhttp:3.3.1'
 
     // realm
@@ -89,4 +89,10 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.14'
+}
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
 }
